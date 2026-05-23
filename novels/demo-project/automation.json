@@ -1,0 +1,11 @@
+{
+  "enabled": false,
+  "last_generated_chapter": 0,
+  "schedule": {
+    "type": "manual",
+    "timezone": "Asia/Macau"
+  },
+  "safety": {
+    "never_overwrite_existing_chapters": true
+  }
+}

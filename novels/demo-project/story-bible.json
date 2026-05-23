@@ -1,0 +1,11 @@
+{
+  "project_id": "demo-project",
+  "title": "示例小说项目",
+  "world": {
+    "summary": "这是 Story Bible 占位内容，用于后续扩展世界观。"
+  },
+  "characters": [],
+  "locations": [],
+  "timeline": [],
+  "rules": []
+}
