@@ -1,1 +1,6 @@
 """后端路由模块。"""
+
+from .health import router as health_router
+from .story_bible import router as story_bible_router
+
+__all__ = ["health_router", "story_bible_router"]
