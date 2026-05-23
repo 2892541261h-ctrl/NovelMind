@@ -1,5 +1,11 @@
 """数据模型与 Schema 模块。"""
 
+from .novel_project import (
+    NovelProjectDetail,
+    NovelProjectSummary,
+    ProjectFiles,
+    ProjectPaths,
+)
 from .story_bible import (
     CharacterProfile,
     LocationProfile,
@@ -13,7 +19,11 @@ from .story_bible import (
 __all__ = [
     "CharacterProfile",
     "LocationProfile",
+    "NovelProjectDetail",
+    "NovelProjectSummary",
     "PlotThread",
+    "ProjectFiles",
+    "ProjectPaths",
     "StoryBible",
     "StoryMetadata",
     "StyleProfile",

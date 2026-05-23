@@ -51,6 +51,21 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-all.ps1
 - 当前只支持 mock provider（不调用网络、不读取 API Key）。
 - 可通过 `GET /health/ai-mock` 验证 gateway 是否正常工作。
 
+## 小说项目 API
+
+小说项目存放在 `novels/{project_id}/` 目录下。提供以下接口：
+
+```powershell
+# 列出所有小说项目
+Invoke-RestMethod http://127.0.0.1:8000/projects
+
+# 查看指定项目详情
+Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project
+
+# 查看项目 Story Bible
+Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/story-bible
+```
+
 ## Story Bible
 
 Story Bible 是一个小说项目的完整设定文件，包含角色、地点、世界规则、剧情线和写作风格。以结构化 JSON 方式存储于 `novels/{project_id}/story-bible.json`。
