@@ -66,6 +66,20 @@ Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project
 Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/story-bible
 ```
 
+## 章节读取 API
+
+章节文件存放在 `novels/{project_id}/chapters/`，当前只支持只读读取。支持 `.md` 和 `.txt` 格式，忽略 `.gitkeep` 和隐藏文件。
+
+`project_id` 和 `chapter_id` 只允许使用字母、数字、短横线和下划线，避免路径穿越。
+
+```powershell
+# 列出指定项目的所有章节
+Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/chapters
+
+# 读取指定章节内容（chapter_id 对应文件名不含扩展名）
+Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/chapters/ch01
+```
+
 ## Story Bible
 
 Story Bible 是一个小说项目的完整设定文件，包含角色、地点、世界规则、剧情线和写作风格。以结构化 JSON 方式存储于 `novels/{project_id}/story-bible.json`。
