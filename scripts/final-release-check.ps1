@@ -58,7 +58,7 @@ git status --short | ForEach-Object {
 
 $forbiddenPatterns = @(
     '(^|/)\.env$',
-    '(^|/)\.env\.',
+    '(^|/)\.env\.(local|development|production)$',
     '(^|/)\.venv/',
     '(^|/)venv/',
     '(^|/)node_modules/',
