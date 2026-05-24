@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -10,6 +11,11 @@ from schemas.chapter_draft import (
 )
 from services import chapter_draft_service as drafts
 from services.daily_writer_service import build_prompt
+
+
+class DraftUpdateRequest(BaseModel):
+    title: str | None = Field(default=None, max_length=200)
+    content: str | None = Field(default=None)
 
 router = APIRouter(prefix="/api/daily-writer", tags=["daily-writer"])
 
@@ -39,6 +45,14 @@ def list_chapters(project_id: int, db: Session = Depends(get_db)):
 @router.get("/chapters/{draft_id}", response_model=ChapterDraftRead)
 def get_chapter(draft_id: int, db: Session = Depends(get_db)):
     draft = drafts.get_draft(db, draft_id)
+    if not draft:
+        raise HTTPException(status_code=404, detail="Chapter draft not found")
+    return drafts.to_read(draft)
+
+
+@router.patch("/chapters/{draft_id}", response_model=ChapterDraftRead)
+def update_draft(draft_id: int, data: DraftUpdateRequest, db: Session = Depends(get_db)):
+    draft = drafts.update_draft(db, draft_id, title=data.title, content=data.content)
     if not draft:
         raise HTTPException(status_code=404, detail="Chapter draft not found")
     return drafts.to_read(draft)

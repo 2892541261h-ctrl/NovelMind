@@ -9,6 +9,8 @@ from routers.chapter import router as chapter_router
 from routers.characters import router as characters_router
 from routers.daily_writer import router as daily_writer_router
 from routers.chapters import router as chapters_router
+from routers.exports import router as exports_router
+from routers.formal_chapters import router as formal_chapters_router
 from routers.foreshadowing import router as foreshadowing_router
 from routers.health import router as health_router
 from routers.novel_project import router as novel_project_router
@@ -51,6 +53,8 @@ app.include_router(foreshadowing_router)
 app.include_router(writing_styles_router)
 app.include_router(reference_novels_router)
 app.include_router(daily_writer_router)
+app.include_router(formal_chapters_router)
+app.include_router(exports_router)
 
 
 @app.get("/")
