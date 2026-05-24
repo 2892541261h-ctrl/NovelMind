@@ -52,11 +52,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-frontend.ps1
 2. 确认 `project_id` 输入框显示当前项目
 3. 如未显示，手动输入 `project_id`
 4. 确认 Reference Profile 状态显示为 connected 或可识别状态
+5. 切换 `Generate`、`Drafts`、`Published` 标签页，确认旧错误或成功提示会被清理
 
 预期结果：
 
 - `project_id` 可以手动修改
 - Daily Writer 继续读取当前项目上下文
+- 中文提示清晰，空 `project_id` 或非法章节编号不会发送生成请求
 
 ## 5. 生成章节草稿
 
@@ -68,6 +70,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-frontend.ps1
 
 - 调用 `POST /api/daily-writer/generate`
 - AI 生成只通过 `backend/ai/gateway.py`
+- 生成中按钮禁用，避免重复点击
+- 生成成功后出现明确成功提示，并可进入 `Drafts` 编辑
 - 同项目同章节号已有草稿时，默认不覆盖旧草稿
 - 如需新版本，应由明确参数创建新草稿，不覆盖旧记录
 
@@ -83,6 +87,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-frontend.ps1
 - 调用 `PATCH /api/daily-writer/chapters/{id}`
 - 只更新当前草稿
 - 不影响正式章节
+- 保存、删除失败时有明确错误提示；删除成功后不会继续显示旧草稿详情
 
 ## 7. 发布正式章节
 
@@ -98,17 +103,20 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-frontend.ps1
 - 草稿仍然保留
 - 同 `project_id + chapter_number` 已有正式章节时返回冲突，不覆盖正式章节
 - 空草稿不能发布，或返回明确错误
+- 发布成功后有明确提示
 
 ## 8. 查看正式章节
 
 1. 在 `Published` 标签页点击正式章节
 2. 查看标题、正文、字数和发布时间
+3. 可点击删除正式章节，确认删除后不影响草稿
 
 预期结果：
 
 - 调用 `GET /api/formal-chapters/{id}`
 - 不再调用正式章节旧路径 `/api/chapters/{id}`
 - 旧 `/api/chapters/{id}` 仅保留给旧章节 CRUD
+- 删除正式章节调用 `DELETE /api/formal-chapters/{id}`；删除成功后不会继续显示旧正式章节详情
 
 ## 9. 导出 Markdown / TXT
 

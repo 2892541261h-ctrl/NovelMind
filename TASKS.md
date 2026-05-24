@@ -1013,6 +1013,47 @@ git status --short
 - `docs/GITHUB_UPLOAD_GUIDE.md`
 - `TASKS.md`
 
+## 阶段 5C：NovelMind v1.1 UI / Writing Quality / Bugfix
+
+### T281-T320：v1.1 UI 优化、写作质量增强与 Bug 修复
+
+状态：DONE
+
+负责工具：Claude Code + Codex
+
+范围：
+
+- 修复 `ReferenceNovelPage` 中 `BASE` 在声明前使用的问题。
+- 优化 `DailyWriterPage` 和 `ReferenceNovelPage` 中文界面、错误提示和成功提示。
+- 切换 tab 时清理旧错误/成功状态，删除草稿或正式章节后清理旧选中详情。
+- loading 时禁用关键按钮，降低重复点击风险。
+- 空 `project_id` 和非法 `chapter_number` 不发送生成请求。
+- 新增正式章节删除入口，并保持正式章节 API 使用 `/api/formal-chapters`。
+- 增强 `Daily Writer` 中文 prompt 的写作质量要求，并保留原创性约束。
+- 增强 Reference Profile 分析 prompt，强调抽象创作规律，不续写、不复制、不搬运、不换皮。
+- 对齐 `scripts/check-mvp-routes.ps1` 的关键路径与原创性检查。
+
+验收：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-env.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-mvp-routes.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-all.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\final-release-check.ps1
+git status --short
+```
+
+产物：
+
+- `backend/services/daily_writer_service.py`
+- `backend/services/reference_novel_service.py`
+- `frontend/src/pages/DailyWriterPage.tsx`
+- `frontend/src/pages/ReferenceNovelPage.tsx`
+- `TASKS.md`
+- `RELEASE_NOTES.md`
+- `docs/MVP_SMOKE_TEST.md`
+- `docs/MVP_DEMO_FLOW.md`
+
 ## 阶段 4：Daily Writer
 
 ### T040：设计 Daily Writer 章节命名规则
