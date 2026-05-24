@@ -5,59 +5,79 @@ const BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
 export function DashboardPage() {
   const [pid, setPid] = useState<number>(() => Number(localStorage.getItem("selectedProjectId")) || 0);
-  const [summary, setSummary] = useState<any>(null);
-  const [health, setHealth] = useState<string>("checking...");
-  const [error, setError] = useState<string | null>(null);
+  const [s, setS] = useState<any>(null);
+  const [health, setHealth] = useState("checking...");
 
   useEffect(() => {
     fetch(`${BASE}/health`).then(r=>r.json()).then(d=>setHealth(d.status==="ok"?"在线":"异常")).catch(()=>setHealth("不可达"));
     if (!pid) return;
-    fetch(`${BASE}/api/project-dashboard/summary?project_id=${pid}`)
-      .then(r=>r.json()).then(setSummary).catch(()=>setError("项目摘要加载失败"));
+    fetch(`${BASE}/api/project-dashboard/summary?project_id=${pid}`).then(r=>r.json()).then(setS).catch(()=>{});
   }, [pid]);
 
-  function setProject(n: number) { setPid(n); if(n>0) localStorage.setItem("selectedProjectId",String(n)); else localStorage.removeItem("selectedProjectId"); }
+  function setProject(n: number) { setPid(n); n>0?localStorage.setItem("selectedProjectId",String(n)):localStorage.removeItem("selectedProjectId"); }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4 flex-wrap">
-        <h2 className="text-lg font-semibold">Dashboard</h2>
-        <label className="flex items-center gap-2 text-xs text-slate-400">
-          项目 ID <input type="number" min={1} value={pid||""} onChange={e=>setProject(Number(e.target.value)||0)} className="w-20 rounded border border-slate-700 bg-slate-800 px-2 py-1 text-sm text-white" />
+    <div style={{maxWidth:960}} className="space-y-6">
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h2 className="text-xl font-bold" style={{color:"var(--text-primary)"}}>下午好，创作者</h2>
+          <p className="text-sm mt-1" style={{color:"var(--text-muted)"}}>继续你的创作之旅。</p>
+        </div>
+        <label className="flex items-center gap-2 text-sm" style={{color:"var(--text-secondary)"}}>
+          当前项目
+          <input type="number" min={1} value={pid||""} onChange={e=>setProject(Number(e.target.value)||0)}
+            className="!w-20" placeholder="ID" />
+          <span className="badge" style={{background:health==="在线"?"var(--emerald-bg)":"var(--red-bg)",color:health==="在线"?"var(--emerald-text)":"var(--red-text)"}}>{health}</span>
         </label>
-        <span className={`text-xs px-2 py-0.5 rounded ${health==="在线"?"bg-emerald-500/20 text-emerald-400":"bg-red-500/20 text-red-400"}`}>后端 {health}</span>
       </div>
 
       {!pid ? (
-        <div className="rounded border border-dashed border-slate-700 p-10 text-center text-sm text-slate-500">输入项目 ID 查看摘要（从其他页面创建的项目 ID 会自动填入）</div>
-      ) : !summary ? (
-        error ? <div className="text-sm text-red-400">{error}</div> : <div className="text-sm text-slate-500">加载中...</div>
+        <div className="empty-state">输入项目 ID 查看创作进度</div>
+      ) : !s ? (
+        <div className="text-sm" style={{color:"var(--text-muted)"}}>加载中...</div>
       ) : (
         <>
-          <div className="grid gap-3 sm:grid-cols-3 md:grid-cols-4">
-            <Stat label="故事圣经" v={summary.has_story_bible?"已建立":"未建立"} color={summary.has_story_bible?"emerald":"slate"} />
-            <Stat label="参考画像" v={summary.has_reference_profile?"已接入":"未接入"} color={summary.has_reference_profile?"emerald":"slate"} />
-            <Stat label="人物卡" v={summary.character_card_count} color="cyan" />
-            <Stat label="世界观条目" v={summary.world_entry_count} color="cyan" />
-            <Stat label="章节计划" v={summary.chapter_plan_count} color="cyan" />
-            <Stat label="草稿" v={summary.draft_count} color="amber" />
-            <Stat label="正式章节" v={summary.formal_chapter_count} color="emerald" />
-            <Stat label="下一章" v={`#${summary.next_chapter_number}`} color="purple" />
-            <Stat label="章节摘要" v={summary.chapter_summary_count} color="cyan" />
-            <Stat label="未解决伏笔" v={summary.open_plot_thread_count} color={summary.open_plot_thread_count>0?"amber":"slate"} />
-            <Stat label="质量检查" v={summary.review_count} color="cyan" />
-            <Stat label="AI 调用" v={summary.usage_call_count} color="purple" />
-            {summary.estimated_total_cost > 0 && <Stat label="估算成本" v={`$${Number(summary.estimated_total_cost).toFixed(6)}`} color="slate" />}
+          <div className="grid gap-3" style={{gridTemplateColumns:"repeat(auto-fill,minmax(120px,1fr))"}}>
+            <Stat label="章节计划" v={s.chapter_plan_count||0} color="var(--purple-text)" bg="var(--purple-bg)" />
+            <Stat label="正式章节" v={s.formal_chapter_count||0} color="var(--emerald-text)" bg="var(--emerald-bg)" />
+            <Stat label="草稿" v={s.draft_count||0} color="var(--amber-text)" bg="var(--amber-bg)" />
+            <Stat label="人物卡" v={s.character_card_count||0} color="var(--cyan-text)" bg="var(--cyan-bg)" />
+            <Stat label="伏笔" v={s.open_plot_thread_count||0} color={s.open_plot_thread_count>0?"var(--amber-text)":"var(--text-muted)"} bg={s.open_plot_thread_count>0?"var(--amber-bg)":"transparent"} />
+            <Stat label="AI 调用" v={s.usage_call_count||0} color="var(--purple-text)" bg="var(--purple-bg)" />
+            {s.estimated_total_cost>0 && <Stat label="估算成本" v={`$${Number(s.estimated_total_cost).toFixed(4)}`} color="var(--text-secondary)" bg="transparent" />}
+            <Stat label="下一章" v={`#${s.next_chapter_number||1}`} color="var(--accent)" bg="transparent" />
+            <Stat label="故事圣经" v={s.has_story_bible?"已建立":"未建立"} color={s.has_story_bible?"var(--emerald-text)":"var(--text-muted)"} bg={s.has_story_bible?"var(--emerald-bg)":"transparent"} />
           </div>
 
-          <div className="rounded-lg border border-slate-800 bg-slate-900 p-5">
-            <h3 className="text-sm font-semibold mb-3">V1 工作流入口</h3>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <Entry to="/reference-novels" title="参考小说分析" desc="添加参考小说，提取抽象创作画像" />
-              <Entry to="/story-bible" title="故事圣经" desc="管理世界观、人物卡、章节计划、伏笔" />
-              <Entry to="/daily-writer" title="Daily Writer" desc="生成草稿、编辑、质量检查、发布正式章节" />
-              <Entry to="/model-settings" title="AI 设置" desc="配置 Provider、模型、查看用量和成本" />
-              <Entry to="/projects" title="项目管理" desc="创建和管理小说项目" />
+          <div className="grid gap-4" style={{gridTemplateColumns:"2fr 1fr"}}>
+            <div className="card space-y-4">
+              <h3 className="font-semibold" style={{color:"var(--text-primary)"}}>下一步建议</h3>
+              <div className="space-y-2">
+                <Hint to="/story-bible" label="完善故事设定" desc="建立世界观、人物卡和伏笔线索" badge={s.has_story_bible?"已完成":"建议优先"} done={s.has_story_bible} />
+                <Hint to="/daily-writer" label="生成下一章草稿" desc={`当前建议章节 #${s.next_chapter_number||1}`} badge={s.draft_count>0?`${s.draft_count} 个草稿`:"开始写作"} done={s.draft_count>0} />
+                <Hint to="/story-bible" label="检查章节连续性" desc={`${s.open_plot_thread_count} 个未解决伏笔`} badge={s.open_plot_thread_count>0?"需要关注":"状态良好"} done={s.open_plot_thread_count===0} />
+                <Hint to="/daily-writer" label="导出小说" desc={`${s.formal_chapter_count} 个正式章节可导出`} badge={s.formal_chapter_count>0?"可导出":"暂无章节"} done={s.formal_chapter_count>0} />
+              </div>
+            </div>
+
+            <div className="card space-y-3">
+              <h3 className="font-semibold" style={{color:"var(--text-primary)"}}>项目健康度</h3>
+              <Gauge label="设定完整度" pct={s.has_story_bible?0.8:0.1} />
+              <Gauge label="人物一致性" pct={Math.min(s.character_card_count/5,1)} />
+              <Gauge label="情节连贯性" pct={Math.min(s.chapter_summary_count/3,1)} />
+              <Gauge label="伏笔完成度" pct={s.open_plot_thread_count===0?1:Math.max(0.3,1-s.open_plot_thread_count*0.15)} />
+            </div>
+          </div>
+
+          <div className="card">
+            <h3 className="font-semibold mb-3" style={{color:"var(--text-primary)"}}>创作工作流</h3>
+            <div className="grid gap-3" style={{gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))"}}>
+              <FlowEntry to="/reference-novels" step="1" label="参考小说" desc="提炼创作画像" />
+              <FlowEntry to="/story-bible" step="2" label="故事圣经" desc="建立世界观" />
+              <FlowEntry to="/story-bible" step="3" label="人物与计划" desc="人物卡+章节计划" />
+              <FlowEntry to="/daily-writer" step="4" label="每日写作" desc="生成+编辑草稿" />
+              <FlowEntry to="/daily-writer" step="5" label="质量检查" desc="Review+改写建议" />
+              <FlowEntry to="/daily-writer" step="6" label="发布导出" desc="发布章节+导出" />
             </div>
           </div>
         </>
@@ -66,17 +86,21 @@ export function DashboardPage() {
   );
 }
 
-function Stat({ label, v, color }: { label: string; v: string|number; color: string }) {
-  const cc: Record<string,string> = {emerald:"text-emerald-400",cyan:"text-cyan-400",amber:"text-amber-400",purple:"text-purple-400",slate:"text-slate-400"};
-  return <div className="rounded border border-slate-800 bg-slate-900 p-3 text-center">
-    <div className="text-xs text-slate-500">{label}</div>
-    <div className={`text-lg font-semibold mt-1 ${cc[color]||"text-slate-300"}`}>{v}</div>
-  </div>;
+function Stat({label,v,color,bg}:{label:string;v:any;color:string;bg:string}) {
+  return <div className="stat-card" style={{background:bg||"var(--bg-card)"}}><div className="text-xs" style={{color:"var(--text-muted)"}}>{label}</div><div className="text-lg font-bold mt-1" style={{color}}>{v}</div></div>;
 }
-
-function Entry({ to, title, desc }: { to: string; title: string; desc: string }) {
-  return <Link to={to} className="rounded border border-slate-700 p-3 hover:border-cyan-500/50 transition text-sm">
-    <div className="text-cyan-400 font-medium">{title}</div>
-    <div className="text-xs text-slate-500 mt-1">{desc}</div>
+function Hint({to,label,desc,badge,done}:{to:string;label:string;desc:string;badge:string;done:boolean}) {
+  return <Link to={to} className="flex items-center justify-between gap-3 p-3 rounded-lg border" style={{borderColor:"var(--border)",background:"var(--bg-card)"}}>
+    <div><div className="text-sm font-medium" style={{color:"var(--text-primary)"}}>{label}</div><div className="text-xs mt-0.5" style={{color:"var(--text-muted)"}}>{desc}</div></div>
+    <span className="badge text-xs" style={{background:done?"var(--emerald-bg)":"var(--amber-bg)",color:done?"var(--emerald-text)":"var(--amber-text)"}}>{badge}</span>
+  </Link>;
+}
+function Gauge({label,pct}:{label:string;pct:number}) {
+  return <div><div className="flex justify-between text-xs mb-1"><span style={{color:"var(--text-secondary)"}}>{label}</span><span style={{color:"var(--text-muted)"}}>{Math.round(pct*100)}%</span></div><div className="h-1.5 rounded-full" style={{background:"var(--bg-input)"}}><div className="h-full rounded-full transition-all" style={{width:`${pct*100}%`,background:pct>0.6?"var(--emerald)":pct>0.3?"var(--amber)":"var(--red)"}}/></div></div>;
+}
+function FlowEntry({to,step,label,desc}:{to:string;step:string;label:string;desc:string}) {
+  return <Link to={to} className="flex items-center gap-3 p-3 rounded-lg border" style={{borderColor:"var(--border)",background:"var(--bg-card)"}}>
+    <span className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{background:"var(--accent)",color:"var(--accent-text)"}}>{step}</span>
+    <div><div className="text-sm font-medium" style={{color:"var(--text-primary)"}}>{label}</div><div className="text-xs" style={{color:"var(--text-muted)"}}>{desc}</div></div>
   </Link>;
 }
