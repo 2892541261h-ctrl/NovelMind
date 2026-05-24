@@ -11,6 +11,7 @@ class AIProviderConfig(Base):
     provider_type: Mapped[str] = mapped_column(String(50), default="mock")
     base_url: Mapped[str] = mapped_column(String(500), default="")
     api_key_env_var: Mapped[str] = mapped_column(String(200), default="")
+    api_key_mode: Mapped[str] = mapped_column(String(20), default="env_var")
     default_model: Mapped[str] = mapped_column(String(200), default="")
     is_active: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

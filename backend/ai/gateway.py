@@ -43,7 +43,8 @@ async def generate_text(request: AIRequest, feature_name: str = "other",
             provider = get_mock_provider(None)
             response = await provider.generate(request)
         elif provider_type == "oai_compat":
-            response = _call_oai_compat(request, model_name, base_url, env_var)
+            key_mode = provider_cfg.api_key_mode if provider_cfg else "env_var"
+            response = _call_oai_compat(request, model_name, base_url, env_var, key_mode, provider_id)
         else:
             from .provider_factory import get_provider as get_mock_provider
             provider = get_mock_provider(None)
@@ -67,8 +68,13 @@ async def generate_text(request: AIRequest, feature_name: str = "other",
                           content="", raw={}, usage={}, error=str(exc))
 
 
-def _call_oai_compat(request: AIRequest, model: str, base_url: str, env_var: str) -> AIResponse:
-    api_key = os.environ.get(env_var, "")
+def _call_oai_compat(request: AIRequest, model: str, base_url: str, env_var: str,
+                     key_mode: str = "env_var", provider_id: int | None = None) -> AIResponse:
+    if key_mode == "direct_local" and provider_id:
+        from services.local_secret_service import get_api_key
+        api_key = get_api_key(provider_id) or ""
+    else:
+        api_key = os.environ.get(env_var, "")
     url = base_url.rstrip("/") + "/chat/completions"
     body = {
         "model": model,
