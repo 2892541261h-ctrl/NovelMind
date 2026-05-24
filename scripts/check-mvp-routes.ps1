@@ -191,5 +191,8 @@ Require-Text "backend/services/daily_writer_service.py" "list_bibles" "Story Bib
 Require-Text "backend/services/daily_writer_service.py" "list_cards" "Character Cards in prompt builder"
 Require-Text "backend/services/daily_writer_service.py" "list_entries" "World Entries in prompt builder"
 Require-Text "backend/services/daily_writer_service.py" "get_plan_by_number" "Chapter Plan in prompt builder"
+Require-Text "backend/services/daily_writer_service.py" "get_recent_summaries" "Chapter summaries in prompt builder"
+Require-Text "backend/services/daily_writer_service.py" "get_open_threads" "Plot threads in prompt builder"
+Require-Text "backend/services/daily_writer_service.py" "_CONTINUITY_RULES" "Continuity rules in prompt builder"
 
 Write-Step "all MVP route checks passed"

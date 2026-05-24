@@ -939,6 +939,36 @@
 - `scripts/check-mvp-routes.ps1`
 - `TASKS.md`
 
+### T326-T340：v1.2 Continuity Enhancement
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- ChapterSummary 模型/CRUD（章节摘要、关键事件、角色变化、未解决线索）
+- PlotThread 模型/CRUD（伏笔/线索管理，status: open/developing/resolved/dropped）
+- continuity_service（snapshot 聚合）
+- Daily Writer prompt 扩展：注入最近章节摘要、未解决伏笔、连续性规则
+- StoryBiblePage 新增"章节摘要"和"伏笔"标签页
+
+新 API（10 个端点）：
+
+- `/api/chapter-summaries` (5)
+- `/api/plot-threads` (5)
+
+产物：
+
+- `backend/models/chapter_summary.py`、`plot_thread.py`
+- `backend/schemas/chapter_summary_schema.py`、`plot_thread_schema.py`
+- `backend/services/cs_service.py`、`pt_service.py`、`continuity_service.py`
+- `backend/routers/chapter_summaries_routes.py`、`plot_threads_routes.py`
+- `backend/services/daily_writer_service.py`（扩展连续性上下文）
+- `frontend/src/pages/StoryBiblePage.tsx`（扩展标签页）
+- `scripts/check-mvp-routes.ps1`
+- `TASKS.md`
+
 ## 阶段 3H：MVP Stabilization & Release Prep
 
 ### T181-T220：MVP 稳定性验收 + Release Prep
