@@ -39,6 +39,31 @@
 .\scripts\verify-all.ps1
 ```
 
+## 阶段 V1 Final：中文 UI 与本地封版体验打磨
+
+### T281-T320：V1 Final Complete Local Release + UI Polish
+
+状态：DONE
+
+负责人：Claude Code + Codex
+
+范围：
+
+- 全站主要界面中文化：Dashboard、Daily Writer、Story Bible、Reference Novel、AI Settings、Sidebar、Layout。
+- 新增浅色/深色主题，主题选择持久化到 `localStorage("novelmind-theme")`。
+- Dashboard、DailyWriterPage、Sidebar、Layout 和 `styles.css` 按中文写作工作台体验重写。
+- 保持 AI Gateway 统一调用规则，不修改后端业务链路，不引入新依赖。
+- 补充 V1 Final 文档记录，后续可进入 Windows MSI 打包阶段。
+
+验收：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-env.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-mvp-routes.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-all.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\final-release-check.ps1
+```
+
 ### T002：创建最小目录骨架
 
 状态：TODO

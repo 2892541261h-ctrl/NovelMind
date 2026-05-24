@@ -1,5 +1,9 @@
 # NovelMind MVP Smoke Test
 
+## V1 Final UI 检查补充
+
+在执行核心链路前，先确认全站主要界面为中文写作工作台风格：Dashboard、Daily Writer、Story Bible、Reference Novel、AI Settings、Sidebar 和 Layout 均应可读。切换浅色/深色主题后刷新页面，主题应继续保持，且主要卡片、按钮、输入框、提示和表格在两种主题下都清晰可读。
+
 本流程用于 MVP RC 手动验收。目标是确认核心链路稳定：
 
 Reference Novel -> Reference Profile -> Writer Context -> Daily Writer -> Chapter Draft -> Edit Draft -> Publish Formal Chapter -> View Formal Chapter -> Export Markdown / TXT

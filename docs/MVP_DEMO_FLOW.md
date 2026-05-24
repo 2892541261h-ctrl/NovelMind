@@ -1,5 +1,9 @@
 # NovelMind MVP Demo Flow
 
+## V1 Final UI 演示提示
+
+开场可以先展示中文 Dashboard 和侧边栏，再切换浅色/深色主题一次，说明主题选择会保存到 `localStorage("novelmind-theme")`。本轮 UI Polish 只是提升本地演示和写作工作台体验，不改变 Reference Profile、Daily Writer、章节发布和导出等核心业务链路。
+
 本流程用于 5-10 分钟演示。重点展示 NovelMind 的 MVP 写作闭环，而不是展示大型平台能力。
 
 ## 演示目标
