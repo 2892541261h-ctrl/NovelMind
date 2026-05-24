@@ -26,6 +26,7 @@ from .story_bible import (
 from .writer_context import (
     NextChapterPreview,
     PromptPreview,
+    ReferenceProfileSummary,
     WriterContext,
     WriterContextWarning,
 )
@@ -44,6 +45,7 @@ __all__ = [
     "ProjectFiles",
     "ProjectPaths",
     "PromptPreview",
+    "ReferenceProfileSummary",
     "StoryBible",
     "StoryMetadata",
     "StyleProfile",

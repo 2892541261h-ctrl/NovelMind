@@ -21,19 +21,6 @@ class WriterContextWarning(BaseModel):
     message: str = ""
 
 
-class WriterContext(BaseModel):
-    """完整的写作上下文，组合已有项目信息。"""
-    project_id: str
-    project: NovelProjectDetail | None = None
-    story_bible: StoryBible | None = None
-    chapters: list[ChapterSummary] = Field(default_factory=list)
-    outline: OutlineConfig | None = None
-    style_profile: StyleProfileConfig | None = None
-    automation: AutomationConfig | None = None
-    summaries: SummariesList = Field(default_factory=lambda: SummariesList(project_id=""))
-    warnings: list[WriterContextWarning] = Field(default_factory=list)
-
-
 class NextChapterPreview(BaseModel):
     """下一章预览（只预览，不创建文件）。"""
     project_id: str
@@ -49,6 +36,41 @@ class PromptMessage(BaseModel):
     """prompt 消息。"""
     role: str = "user"   # system / user / assistant
     content: str = ""
+
+
+class ReferenceProfileSummary(BaseModel):
+    """写作上下文中可用的参考创作画像摘要。"""
+    id: int = 0
+    novel_id: int = 0
+    project_id: int = 0
+    genre: str = ""
+    worldbuilding_pattern: str = ""
+    character_archetypes: str = ""
+    conflict_patterns: str = ""
+    writing_style_profile: str = ""
+    plot_progression_model: str = ""
+    target_novel_direction: str = ""
+    constraints: list[str] = Field(default_factory=lambda: [
+        "只能参考抽象创作规律，不能续写参考小说",
+        "不能复制参考小说原文",
+        "不能复用原书专有角色名、地名、组织名",
+        "不能复用原书剧情事件和桥段",
+        "必须服务于用户自己的原创小说",
+    ])
+
+
+class WriterContext(BaseModel):
+    """完整的写作上下文，组合已有项目信息。"""
+    project_id: str
+    project: NovelProjectDetail | None = None
+    story_bible: StoryBible | None = None
+    chapters: list[ChapterSummary] = Field(default_factory=list)
+    outline: OutlineConfig | None = None
+    style_profile: StyleProfileConfig | None = None
+    automation: AutomationConfig | None = None
+    summaries: SummariesList = Field(default_factory=lambda: SummariesList(project_id=""))
+    reference_profile: ReferenceProfileSummary | None = None
+    warnings: list[WriterContextWarning] = Field(default_factory=list)
 
 
 class PromptPreview(BaseModel):
