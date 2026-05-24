@@ -6,6 +6,20 @@ NovelMind V1 Final 已进入本地完整封版状态，前端已按中文写作�
 
 本轮不改变后端业务链路、不改变 AI Gateway 规则、不新增依赖。后续可在当前本地封版基础上进入 Windows MSI 打包阶段。
 
+## Windows MSI Installer Preview
+
+NovelMind 提供 Windows MSI 安装器预览源码，位于 `installer/`。该预览版使用 WiX Toolset 构建，目标是提供本地安装、桌面快捷方式、开始菜单快捷方式和一键启动体验。
+
+构建命令：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\installer\build-msi.ps1
+```
+
+安装器预览版仍依赖本机已有 PowerShell、Python 和 Node.js，不是完全离线桌面应用。MSI 构建产物输出到 `installer/dist/NovelMind-V1-Setup.msi`，不得提交到 Git。真实 AI Key 仍应通过本机环境变量配置，不要打进安装包。
+
+更多说明见 `docs/WINDOWS_INSTALLER_GUIDE.md`。
+
 AI 长篇小说创作平台。支持多 AI Provider、Story Bible 小说设定、Reference Creation Profile 参考创作档案、Daily Writer 自动章节生成。
 
 ## 当前已完成功能

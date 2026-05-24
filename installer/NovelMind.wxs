@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package
+    Name="NovelMind V1"
+    Manufacturer="NovelMind"
+    Version="1.0.0.0"
+    UpgradeCode="9B76D687-3B49-4E93-8FA7-55BCEFD0B9B9"
+    Scope="perMachine">
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of NovelMind is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="NovelMind" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="DesktopFolder" />
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ProgramMenuNovelMindFolder" Name="NovelMind" />
+    </StandardDirectory>
+
+    <Feature Id="MainFeature" Title="NovelMind" Level="1">
+      <ComponentGroupRef Id="NovelMindFiles" />
+      <ComponentRef Id="DesktopShortcutComponent" />
+      <ComponentRef Id="StartMenuShortcutComponent" />
+    </Feature>
+
+    <ComponentGroup Id="NovelMindFiles" Directory="INSTALLFOLDER">
+      <Files
+        Include="$(var.RepoRoot)\**"
+        Exclude="$(var.RepoRoot)\.git\**;$(var.RepoRoot)\.venv\**;$(var.RepoRoot)\venv\**;$(var.RepoRoot)\node_modules\**;$(var.RepoRoot)\frontend\node_modules\**;$(var.RepoRoot)\frontend\dist\**;$(var.RepoRoot)\installer\dist\**;$(var.RepoRoot)\.pytest_cache\**;$(var.RepoRoot)\.env;$(var.RepoRoot)\.env.local;$(var.RepoRoot)\.env.development;$(var.RepoRoot)\.env.production;$(var.RepoRoot)\*.db;$(var.RepoRoot)\backend\*.db;$(var.RepoRoot)\*.msi;$(var.RepoRoot)\*.wixpdb;$(var.RepoRoot)\*.wixobj;$(var.RepoRoot)\*.zip;$(var.RepoRoot)\*.exe" />
+    </ComponentGroup>
+
+    <Component Id="DesktopShortcutComponent" Directory="DesktopFolder">
+      <Shortcut
+        Id="DesktopShortcut"
+        Name="NovelMind"
+        Target="[INSTALLFOLDER]NovelMind Launcher.bat"
+        WorkingDirectory="INSTALLFOLDER" />
+      <RegistryValue Root="HKCU" Key="Software\NovelMind" Name="DesktopShortcut" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <Component Id="StartMenuShortcutComponent" Directory="ProgramMenuNovelMindFolder">
+      <Shortcut
+        Id="StartMenuShortcut"
+        Name="NovelMind"
+        Target="[INSTALLFOLDER]NovelMind Launcher.bat"
+        WorkingDirectory="INSTALLFOLDER" />
+      <RemoveFolder Id="RemoveProgramMenuNovelMindFolder" On="uninstall" />
+      <RegistryValue Root="HKCU" Key="Software\NovelMind" Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+  </Package>
+</Wix>

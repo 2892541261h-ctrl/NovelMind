@@ -1,3 +1,15 @@
+# Windows Installer Preview Checklist
+
+Before building or publishing a Windows installer preview:
+
+- Run `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-installer.ps1`.
+- Run `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\installer\build-msi.ps1` only on a machine with WiX Toolset installed.
+- Confirm `installer/dist/NovelMind-V1-Setup.msi` is not committed to Git.
+- Confirm no `.msi`, `.exe`, `.zip`, `.wixobj`, or `.wixpdb` build artifacts are staged.
+- Confirm the MSI does not package `.env`, `.venv`, `node_modules`, `frontend/dist`, `*.db`, API Key, Token, or private key files.
+- Confirm real AI keys are configured through local environment variables, not installer files.
+- If distributing later, upload the MSI manually as a GitHub Release artifact after checks; do not commit it to the repository.
+
 # NovelMind Release Checklist
 
 本清单用于 MVP RC 合并、演示或封版前检查。

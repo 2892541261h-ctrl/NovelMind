@@ -16,5 +16,13 @@ node_modules/
 dist/
 .vite/
 
+installer/dist/
+*.msi
+*.wixpdb
+*.wixobj
+installer/**/*.msi
+installer/**/*.exe
+installer/**/*.zip
+
 .DS_Store
 Thumbs.db
