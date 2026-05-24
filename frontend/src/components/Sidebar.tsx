@@ -8,6 +8,7 @@ const links = [
   { to: "/chapters", label: "Chapters" },
   { to: "/model-settings", label: "Model Settings" },
   { to: "/daily-writer", label: "Daily Writer" },
+  { to: "/reference-novels", label: "Ref Novels" },
 ];
 
 export function Sidebar() {

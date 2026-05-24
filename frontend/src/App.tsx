@@ -8,6 +8,7 @@ import { ChaptersPage } from "./pages/ChaptersPage";
 import { StoryBiblePage } from "./pages/StoryBiblePage";
 import { ModelSettingsPage } from "./pages/ModelSettingsPage";
 import { DailyWriterPage } from "./pages/DailyWriterPage";
+import { ReferenceNovelPage } from "./pages/ReferenceNovelPage";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="story-bible" element={<StoryBiblePage />} />
           <Route path="model-settings" element={<ModelSettingsPage />} />
           <Route path="daily-writer" element={<DailyWriterPage />} />
+          <Route path="reference-novels" element={<ReferenceNovelPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

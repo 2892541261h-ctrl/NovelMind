@@ -14,6 +14,7 @@ from routers.novel_project import router as novel_project_router
 from routers.outlines import router as outlines_router
 from routers.project_config import router as project_config_router
 from routers.projects import router as projects_router
+from routers.reference_novels import router as reference_novels_router
 from routers.story_bible import router as story_bible_router
 from routers.world_settings import router as world_settings_router
 from routers.writer import router as writer_router
@@ -47,6 +48,7 @@ app.include_router(outlines_router)
 app.include_router(chapters_router)
 app.include_router(foreshadowing_router)
 app.include_router(writing_styles_router)
+app.include_router(reference_novels_router)
 
 
 @app.get("/")
