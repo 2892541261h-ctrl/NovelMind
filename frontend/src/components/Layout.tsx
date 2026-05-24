@@ -9,6 +9,7 @@ const titles: Record<string, string> = {
   "/story-bible": "Story Bible",
   "/model-settings": "Model Settings",
   "/daily-writer": "Daily Writer",
+  "/reference-novels": "Reference Novels",
 };
 
 export function Layout() {

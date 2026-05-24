@@ -664,6 +664,94 @@
 
 - `README.md`
 
+## 阶段 3D：参考小说引导原创写作基础
+
+### T081：Reference Novel 数据模型
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- SQLAlchemy ORM 模型：ReferenceNovel（id, project_id, title, author, content, source_type, status）
+- SQLAlchemy ORM 模型：ReferenceProfile（id, novel_id, project_id, genre, worldbuilding_pattern, character_archetypes, conflict_patterns, writing_style_profile, plot_progression_model, target_novel_direction, confidence, status）
+- Pydantic schemas：Create/Update/Response
+
+产物：
+
+- `backend/models/reference_novel.py`、`reference_profile.py`
+- `backend/schemas/reference_novel.py`、`reference_profile.py`
+
+### T082：Reference Novel 服务层
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- CRUD 操作（create/read/update/delete/list）
+- 参考小说分析生成 Reference Profile（通过 AI Gateway mock）
+- Profile 的 CRUD 操作
+- 分析结果包含：genre, worldbuilding, character archetypes, conflict patterns, writing style, plot progression, creative direction
+
+产物：
+
+- `backend/services/reference_novel_service.py`
+
+### T083：Reference Novel API 路由
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- CRUD endpoints：list/create/get/update/delete
+- POST /api/reference-novels/{id}/analyze — 调用 AI Gateway 生成 Reference Profile
+- GET /api/reference-novels/{id}/profile — 获取 Profile
+- 所有 AI 调用经过 backend/ai/gateway.py
+
+产物：
+
+- `backend/routers/reference_novels.py`
+
+### T084：前端 Reference Novel 页面
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- 项目选择器 + 参考小说列表
+- 粘贴/输入参考小说文本
+- 查看分析生成的 Reference Profile
+- 删除参考小说和 Profile
+- 导航入口：Sidebar + App 路由
+
+产物：
+
+- `frontend/src/pages/ReferenceNovelPage.tsx`
+
+### T085：集成与文档
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- main.py 挂载 reference_novels_router
+- App.tsx 路由配置
+- Sidebar 导航链接
+- TASKS.md 记录 T081-T085
+
+产物：
+
+- `backend/main.py`、`frontend/src/App.tsx`、`frontend/src/components/Sidebar.tsx`
+
 ## 阶段 4：Daily Writer
 
 ### T040：设计 Daily Writer 章节命名规则
