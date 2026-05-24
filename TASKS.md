@@ -937,6 +937,47 @@ git status --short
 - `TASKS.md`
 - `scripts/verify-all.ps1`
 
+## 阶段 5A：MVP 1.0 Final Release Prep
+
+### T221-T260：NovelMind MVP 1.0 Final Release Prep
+
+状态：DONE
+
+负责工具：Codex
+
+范围：
+
+- 从 `main` 创建本轮 T221-T260 final release prep 分支。
+- 检查 MVP 链路描述和代码路径一致性。
+- 新增 `scripts/final-release-check.ps1`，串行运行 `check-env.ps1`、`check-mvp-routes.ps1`、`verify-all.ps1`，并检查 git clean、禁止提交文件、敏感凭证模式、导出小说文件和大文件。
+- 新增 `RELEASE_NOTES.md`，记录 MVP 1.0 当前能力、核心链路、已知限制和下一阶段计划。
+- 新增 `docs/GITHUB_UPLOAD_GUIDE.md`，记录上传 GitHub 前的人工步骤，但不执行 push、不创建 tag。
+- 新增 `docs/MVP_ACCEPTANCE_REPORT_TEMPLATE.md`，用于记录本地验收结果。
+- 更新 `docs/RELEASE_CHECKLIST.md`，加入 final release check。
+- 更新 README 的 MVP 1.0 final release prep 说明、最终封版检查命令和文档入口。
+- 确认本轮没有修改 AI Gateway、Daily Writer prompt、Reference Profile、草稿生成、草稿发布、正式章节 CRUD 或导出业务逻辑。
+- 确认没有新增用户系统、权限系统、支付系统、云部署、多模型调度、Agent 调度平台、富文本编辑器或 GitHub Actions 自动 PR。
+
+验收：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-env.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-mvp-routes.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-all.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\final-release-check.ps1
+git status --short
+```
+
+产物：
+
+- `scripts/final-release-check.ps1`
+- `RELEASE_NOTES.md`
+- `docs/GITHUB_UPLOAD_GUIDE.md`
+- `docs/MVP_ACCEPTANCE_REPORT_TEMPLATE.md`
+- `docs/RELEASE_CHECKLIST.md`
+- `README.md`
+- `TASKS.md`
+
 ## 阶段 4：Daily Writer
 
 ### T040：设计 Daily Writer 章节命名规则
