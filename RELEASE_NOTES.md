@@ -4,6 +4,17 @@ NovelMind MVP 1.0 是本地可运行的长篇小说创作 MVP 封版状态。它
 
 Reference Novel -> Reference Profile -> Writer Context -> Daily Writer -> Chapter Draft -> Edit Draft -> Publish Formal Chapter -> View Formal Chapter -> Export Markdown / TXT
 
+## v1.1 更新记录
+
+v1.1 是 MVP 1.0 之后的本地稳定性与体验增强版本，重点不是新增大型功能，而是提升演示可用性、错误反馈和写作输出质量。
+
+- 优化 `Daily Writer` 中文界面、状态提示和关键按钮 loading 禁用，降低重复点击风险。
+- 优化 `Reference Novels` 中文界面，修复 `BASE` 在声明前使用的问题。
+- 切换标签页、删除草稿、删除正式章节后会清理过期状态，避免旧详情继续显示。
+- 新增正式章节删除入口，并补充发布、保存、删除等成功提示。
+- 增强 `Daily Writer` prompt 的中文写作质量要求，继续禁止续写、复制、搬运角色/地名/组织名/剧情事件或简单换皮。
+- 增强 Reference Profile 分析 prompt，强调只提取抽象创作规律，不输出原文搬运或具体剧情链条。
+
 ## 当前能力
 
 - Windows 本地启动后端和前端。

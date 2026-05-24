@@ -30,6 +30,8 @@ export function DailyWriterPage() {
   const [editContent, setEditContent] = useState("");
   const [editSaving, setEditSaving] = useState(false);
   const [pubLoading, setPubLoading] = useState(false);
+  const [deletingDraftId, setDeletingDraftId] = useState<number | null>(null);
+  const [deletingFormalId, setDeletingFormalId] = useState<number | null>(null);
 
   const loadDrafts = useCallback(async () => {
     if (!pid) { setDrafts([]); return; }
@@ -57,6 +59,7 @@ export function DailyWriterPage() {
 
   async function handleGenerate() {
     if (!pid) { setError("请先输入项目 ID"); return; }
+    if (!Number.isInteger(cNum) || cNum < 1) { setError("请输入有效的章节编号（>= 1）"); return; }
     setGenLoading(true); setError(null); setSuccess(null);
     try {
       const r = await fetch(`${BASE}/api/daily-writer/generate`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({project_id:pid, chapter_number:cNum, title, writing_goal:goal, extra_instruction:extra}) });
@@ -87,10 +90,19 @@ export function DailyWriterPage() {
 
   async function deleteDraft(id: number) {
     if (!confirm("确认删除此草稿？删除后不可恢复。")) return;
+    setDeletingDraftId(id);
     setError(null); setSuccess(null);
-    await fetch(`${BASE}/api/daily-writer/chapters/${id}`, { method:"DELETE" });
-    if (selDraft?.id === id) setSelDraft(null);
-    loadDrafts();
+    try {
+      const r = await fetch(`${BASE}/api/daily-writer/chapters/${id}`, { method:"DELETE" });
+      if (!r.ok) {
+        const data = await r.json().catch(() => null) as { detail?: string } | null;
+        throw new Error(data?.detail || `HTTP ${r.status}`);
+      }
+      if (selDraft?.id === id) setSelDraft(null);
+      setSuccess("草稿已删除");
+      loadDrafts();
+    } catch(e) { setError(e instanceof Error ? e.message : "删除草稿失败"); }
+    finally { setDeletingDraftId(null); }
   }
 
   async function publishDraft() {
@@ -112,10 +124,19 @@ export function DailyWriterPage() {
 
   async function deleteFormal(id: number) {
     if (!confirm("确认删除此正式章节？删除后不可恢复。")) return;
+    setDeletingFormalId(id);
     setError(null); setSuccess(null);
-    await fetch(`${BASE}/api/formal-chapters/${id}`, { method:"DELETE" });
-    if (selFormal?.id === id) setSelFormal(null);
-    loadFormal();
+    try {
+      const r = await fetch(`${BASE}/api/formal-chapters/${id}`, { method:"DELETE" });
+      if (!r.ok) {
+        const data = await r.json().catch(() => null) as { detail?: string } | null;
+        throw new Error(data?.detail || `HTTP ${r.status}`);
+      }
+      if (selFormal?.id === id) setSelFormal(null);
+      setSuccess("正式章节已删除");
+      loadFormal();
+    } catch(e) { setError(e instanceof Error ? e.message : "删除正式章节失败"); }
+    finally { setDeletingFormalId(null); }
   }
 
   function exportMarkdown() { if (pid) window.open(`${BASE}/api/exports/project/${pid}/markdown`); }
@@ -244,7 +265,9 @@ export function DailyWriterPage() {
                       <button onClick={publishDraft} disabled={pubLoading} className="rounded bg-emerald-600 px-3 py-1 text-xs text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition">
                         {pubLoading ? "发布中..." : "发布为正式章节"}
                       </button>
-                      <button onClick={()=>deleteDraft(selDraft.id)} disabled={editSaving||pubLoading} className="text-xs text-red-400 hover:underline disabled:text-slate-600 disabled:no-underline disabled:cursor-not-allowed">删除</button>
+                      <button onClick={()=>deleteDraft(selDraft.id)} disabled={editSaving||pubLoading||deletingDraftId===selDraft.id} className="text-xs text-red-400 hover:underline disabled:text-slate-600 disabled:no-underline disabled:cursor-not-allowed">
+                        {deletingDraftId===selDraft.id ? "删除中..." : "删除"}
+                      </button>
                     </div>
                   </div>
                   <label className="block text-xs text-slate-500 space-y-1">
@@ -260,7 +283,9 @@ export function DailyWriterPage() {
                 <div className="rounded-lg border border-emerald-500/30 bg-slate-900 p-5">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-semibold">#{selFormal.chapter_number} {selFormal.title||"章节"} <span className="text-xs text-emerald-400 font-normal">已发布</span></h3>
-                    <button onClick={()=>deleteFormal(selFormal.id)} className="text-xs text-red-400 hover:underline">删除</button>
+                    <button onClick={()=>deleteFormal(selFormal.id)} disabled={deletingFormalId===selFormal.id} className="text-xs text-red-400 hover:underline disabled:text-slate-600 disabled:no-underline disabled:cursor-not-allowed">
+                      {deletingFormalId===selFormal.id ? "删除中..." : "删除"}
+                    </button>
                   </div>
                   <div className="max-h-96 overflow-y-auto rounded bg-slate-950 p-4">
                     <pre className="text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">{selFormal.content}</pre>
