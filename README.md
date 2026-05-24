@@ -203,6 +203,13 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\final-release-
 | `POST /api/chapter-reviews/review-draft/{id}` | v1.2 草稿质量检查 |
 | `POST /api/chapter-reviews/review-formal/{id}` | v1.2 正式章节质量检查 |
 | `POST /api/chapter-reviews/suggest-rewrite-draft/{id}` | v1.2 草稿改写建议 |
+| `GET /api/ai/providers` | AI 服务商配置 |
+| `POST /api/ai/providers/{id}/local-key` | 本机直填 API Key |
+| `POST /api/ai/providers/{id}/test` | 测试 AI 连接 |
+| `GET /api/ai/models` | AI 模型配置 |
+| `GET /api/ai/usage-logs` | 调用日志 |
+| `GET /api/ai/usage-logs/summary` | 调用统计与估算成本 |
+| `GET /api/project-dashboard/summary` | 项目仪表盘摘要 |
 
 完整接口列表见各 `backend/routers/*.py`。
 
@@ -216,8 +223,22 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\final-release-
 | `/characters` | 角色管理 | 已完成 |
 | `/chapters` | 章节管理 | 已完成 |
 | `/story-bible` | Story Bible / 人物卡 / 世界观 / 章节计划 / 摘要 / 伏笔 | v1.2 |
-| `/model-settings` | 模型设置 | 占位 |
+| `/model-settings` | AI 设置（服务商/模型/日志） | 已完成 |
 | `/daily-writer` | Daily Writer / 连续性上下文 / 章节质量检查 | v1.2 |
+
+## AI Key 配置模式
+
+NovelMind 支持两种 API Key 配置方式：
+
+### 环境变量模式（env_var）
+
+在 AI 设置中填写 `api_key_env_var`（例如 `OAI_API_KEY`），后端从系统环境变量中读取真实 Key。适合团队共享或 CI 环境。
+
+### 本机直填模式（direct_local）
+
+在 AI 设置中选择"本机直填"，直接粘贴 API Key。Key 仅保存在你的电脑上（`%APPDATA%/NovelMind/secrets.local.json`），**不会提交到 GitHub**，**不会打进 MSI 安装包**，**不会出现在 Usage Log 中**。保存后页面只显示脱敏结果（如 `sk-****abcd`），永远不会明文返回完整 Key。
+
+> 如果重装系统或换电脑，需要重新填写 API Key。
 
 ## 不要提交的文件
 

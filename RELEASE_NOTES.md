@@ -8,6 +8,7 @@ V1 Final 是当前本地完整封版状态。本轮重点是 UI 中文化、浅�
 - 新增浅色/深色主题，主题选择持久化到 `localStorage("novelmind-theme")`。
 - Dashboard、DailyWriterPage、Sidebar、Layout 和全局样式按中文写作工作台体验重写。
 - 统一 card、button、badge、tab、toast、empty-state、sidebar-link 和 stat-card 等基础样式。
+- 新增本机直填 API Key 模式（direct_local）：可在 AI 设置中直接粘贴 API Key，密钥保存在 `%APPDATA%/NovelMind/secrets.local.json`，不提交 GitHub、不打进 MSI、不在日志中出现。前端只显示脱敏结果。保留原有环境变量模式（env_var）。
 - 后端业务逻辑、AI Gateway 和 API 路径保持稳定。
 - 下一阶段可进入 Windows MSI 本地安装包打包准备。
 
