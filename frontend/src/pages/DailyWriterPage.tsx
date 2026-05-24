@@ -33,6 +33,10 @@ export function DailyWriterPage() {
   const [deletingDraftId, setDeletingDraftId] = useState<number | null>(null);
   const [deletingFormalId, setDeletingFormalId] = useState<number | null>(null);
   const [v12Counts, setV12Counts] = useState<{bibles:number;cards:number;entries:number;plans:number;nextChapter:number;hasPlan:boolean}|null>(null);
+  const [reviewing, setReviewing] = useState(false);
+  const [reviewResult, setReviewResult] = useState<any>(null);
+  const [rewriting, setRewriting] = useState(false);
+  const [rewriteResult, setRewriteResult] = useState<any>(null);
 
   const loadDrafts = useCallback(async () => {
     if (!pid) { setDrafts([]); return; }
@@ -160,6 +164,42 @@ export function DailyWriterPage() {
 
   function exportMarkdown() { if (pid) window.open(`${BASE}/api/exports/project/${pid}/markdown`); }
   function exportTxt() { if (pid) window.open(`${BASE}/api/exports/project/${pid}/txt`); }
+
+  async function reviewDraft() {
+    if (!selDraft) return; setReviewing(true); setError(null); setReviewResult(null);
+    try {
+      const r = await fetch(`${BASE}/api/chapter-reviews/review-draft/${selDraft.id}`, { method:"POST" });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.detail || `HTTP ${r.status}`);
+      setReviewResult(data);
+      setSuccess("质量检查完成");
+    } catch(e) { setError(e instanceof Error ? e.message : "review failed"); }
+    finally { setReviewing(false); }
+  }
+
+  async function reviewFormal() {
+    if (!selFormal) return; setReviewing(true); setError(null); setReviewResult(null);
+    try {
+      const r = await fetch(`${BASE}/api/chapter-reviews/review-formal/${selFormal.id}`, { method:"POST" });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.detail || `HTTP ${r.status}`);
+      setReviewResult(data);
+      setSuccess("质量检查完成");
+    } catch(e) { setError(e instanceof Error ? e.message : "review failed"); }
+    finally { setReviewing(false); }
+  }
+
+  async function suggestRewrite() {
+    if (!selDraft) return; setRewriting(true); setError(null); setRewriteResult(null);
+    try {
+      const r = await fetch(`${BASE}/api/chapter-reviews/suggest-rewrite-draft/${selDraft.id}`, { method:"POST" });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.detail || `HTTP ${r.status}`);
+      setRewriteResult(data);
+      setSuccess("改写建议已生成（未自动修改正文）");
+    } catch(e) { setError(e instanceof Error ? e.message : "rewrite failed"); }
+    finally { setRewriting(false); }
+  }
 
   return (
     <div className="space-y-4">
@@ -297,6 +337,8 @@ export function DailyWriterPage() {
                       <button onClick={()=>deleteDraft(selDraft.id)} disabled={editSaving||pubLoading||deletingDraftId===selDraft.id} className="text-xs text-red-400 hover:underline disabled:text-slate-600 disabled:no-underline disabled:cursor-not-allowed">
                         {deletingDraftId===selDraft.id ? "删除中..." : "删除"}
                       </button>
+                      <button onClick={reviewDraft} disabled={reviewing} className="text-xs text-purple-400 hover:underline disabled:text-slate-600 disabled:no-underline disabled:cursor-not-allowed">{reviewing?"检查中...":"质量检查"}</button>
+                      <button onClick={suggestRewrite} disabled={rewriting} className="text-xs text-amber-400 hover:underline disabled:text-slate-600 disabled:no-underline disabled:cursor-not-allowed">{rewriting?"生成建议...":"改写建议"}</button>
                     </div>
                   </div>
                   <label className="block text-xs text-slate-500 space-y-1">
@@ -306,6 +348,25 @@ export function DailyWriterPage() {
                     正文 <textarea value={editContent} onChange={e=>setEditContent(e.target.value)} rows={16} className="w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white font-mono leading-relaxed resize-y" />
                   </label>
                   <p className="text-xs text-slate-600">在此编辑草稿标题和正文。点击"保存草稿"保存修改。点击"发布为正式章节"将其转为正式章节（草稿会保留，正式章节不会被覆盖）。</p>
+                  {(reviewResult || rewriteResult) && (
+                    <div className="border-t border-slate-800 pt-3 mt-3 space-y-3">
+                      {reviewResult && <div className="rounded bg-slate-950 p-3 text-xs space-y-1">
+                        <span className="text-purple-400 font-medium">质量检查结果</span>
+                        <div className="grid grid-cols-4 gap-1 text-slate-400">
+                          <span>综合 {reviewResult.overall_score}</span><span>连贯 {reviewResult.continuity_score}</span><span>人物 {reviewResult.character_consistency_score}</span><span>节奏 {reviewResult.pacing_score}</span>
+                          <span>风格 {reviewResult.style_score}</span><span>原创 {reviewResult.originality_score}</span><span>目标 {reviewResult.goal_alignment_score}</span>
+                        </div>
+                        {reviewResult.issues && <div className="text-red-400 mt-1">{reviewResult.issues.slice(0,300)}</div>}
+                        {reviewResult.suggestions && <div className="text-amber-400 mt-1">{reviewResult.suggestions.slice(0,300)}</div>}
+                      </div>}
+                      {rewriteResult && (
+                        <div className="rounded bg-slate-950 p-3 text-xs space-y-2">
+                          <span className="text-amber-400 font-medium">改写建议（未自动修改正文）</span>
+                          {rewriteResult.suggested_revision_notes && <div className="text-slate-400">{rewriteResult.suggested_revision_notes.slice(0,400)}</div>}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
               {selFormal && !selDraft && (
@@ -315,11 +376,21 @@ export function DailyWriterPage() {
                     <button onClick={()=>deleteFormal(selFormal.id)} disabled={deletingFormalId===selFormal.id} className="text-xs text-red-400 hover:underline disabled:text-slate-600 disabled:no-underline disabled:cursor-not-allowed">
                       {deletingFormalId===selFormal.id ? "删除中..." : "删除"}
                     </button>
+                    <button onClick={reviewFormal} disabled={reviewing} className="text-xs text-purple-400 hover:underline disabled:text-slate-600 disabled:no-underline">{reviewing?"检查中...":"质量检查"}</button>
                   </div>
                   <div className="max-h-96 overflow-y-auto rounded bg-slate-950 p-4">
                     <pre className="text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">{selFormal.content}</pre>
                   </div>
                   <p className="text-xs text-slate-600 mt-3">{selFormal.word_count} 字 · 发布于 {selFormal.published_at ? new Date(selFormal.published_at).toLocaleDateString("zh-CN") : "-"}</p>
+                  {reviewResult && <div className="mt-3 rounded bg-slate-950 p-3 text-xs space-y-1">
+                    <span className="text-purple-400 font-medium">质量检查结果</span>
+                    <div className="grid grid-cols-4 gap-1 text-slate-400">
+                      <span>综合 {reviewResult.overall_score}</span><span>连贯 {reviewResult.continuity_score}</span><span>人物 {reviewResult.character_consistency_score}</span><span>节奏 {reviewResult.pacing_score}</span>
+                      <span>风格 {reviewResult.style_score}</span><span>原创 {reviewResult.originality_score}</span><span>目标 {reviewResult.goal_alignment_score}</span>
+                    </div>
+                    {reviewResult.issues && <div className="text-red-400 mt-1">{reviewResult.issues.slice(0,300)}</div>}
+                    {reviewResult.suggestions && <div className="text-amber-400 mt-1">{reviewResult.suggestions.slice(0,300)}</div>}
+                  </div>}
                 </div>
               )}
               {!selDraft && !selFormal && (

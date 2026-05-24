@@ -9,7 +9,9 @@ from routers.chapter import router as chapter_router
 from routers.character_cards_routes import router as cc_routes_router
 from routers.characters import router as characters_router
 from routers.chapter_plans_routes import router as cp_routes_router
+from routers.chapter_reviews_routes import router as cr_review_router
 from routers.chapter_summaries_routes import router as cs_routes_router
+from routers.continuity_routes import router as continuity_router
 from routers.daily_writer import router as daily_writer_router
 from routers.chapters import router as chapters_router
 from routers.exports import router as exports_router
@@ -67,6 +69,8 @@ app.include_router(we_routes_router)
 app.include_router(cp_routes_router)
 app.include_router(cs_routes_router)
 app.include_router(pt_routes_router)
+app.include_router(cr_review_router)
+app.include_router(continuity_router)
 
 
 @app.get("/")
