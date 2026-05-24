@@ -1,0 +1,17 @@
+.env
+.env.local
+.env.development
+.env.production
+
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.sqlite3
+
+node_modules/
+dist/
+.vite/
+
+.DS_Store
+Thumbs.db

@@ -70,6 +70,41 @@
 - Claude Code：数据模型、API、页面。
 - Codex：任务拆分、审查、CI。
 
+## 阶段 3A：参考小说驱动原创写作
+
+目标：支持用户提供参考小说，由 AI 抽象其创作方向，再辅助生成用户自己的原创小说设定，而不是续写、复制、改写或换皮参考小说。
+
+核心概念：
+
+- Reference Creation Profile（参考创作档案）：从参考小说中提取出来的参考方向。
+- Story Bible（小说圣经）：用户自己的原创小说设定。
+
+正确工作流：
+
+```text
+参考小说
+-> AI 阅读理解
+-> 生成 Reference Creation Profile
+-> 用户确认创作方向
+-> 生成用户原创小说的 Story Bible
+-> Daily Writer 根据 Story Bible 写用户自己的小说
+```
+
+范围：
+
+- 定义 Reference Creation Profile 字段和边界。
+- 设计参考小说导入、分章、分块理解流程。
+- 设计参考小说分析 Prompt。
+- 设计从 Reference Creation Profile 生成原创 Story Bible 的流程。
+- 设计 Daily Writer 读取 Reference Creation Profile 的规则。
+- 设计原创性、人物不照搬、剧情不换皮检查规则。
+- 明确所有 AI 调用仍必须通过 `backend/ai/gateway.py`。
+
+主要负责人：
+
+- Codex：规划文档、任务拆分、校验脚本、数据结构草案、Prompt 文件草案、规则文档。
+- Claude Code：后端业务逻辑、文件导入、长文本分块、AI 分析流程、Story Bible 生成逻辑、Daily Writer 接入、前端页面。
+
 ## 阶段 4：Daily Writer 本地流程
 
 目标：在本地安全生成新章节。
@@ -77,10 +112,12 @@
 范围：
 
 - 读取 Story Bible。
+- 读取用户确认过的 Reference Creation Profile。
 - 选择下一章。
 - 调用 AI Gateway。
 - 写入新章节文件。
 - 如果目标章节已存在，则失败，不覆盖。
+- 不直接续写参考小说，不复制参考小说原文、角色名或完整剧情桥段。
 
 主要负责人：
 

@@ -76,6 +76,47 @@
 .\scripts\verify-all.ps1
 ```
 
+### T007：Project Config 只读配置接口基础
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- `backend/routers/project_config.py`
+- `backend/schemas/project_config.py`
+- `backend/services/project_config_service.py`
+- `backend/main.py`
+
+说明：
+
+- 已接入 FastAPI。
+- 已验证 `verify-all.ps1` 通过。
+
+### T008：Writer Context 只读上下文预览基础
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- `backend/routers/writer.py`
+- `backend/schemas/writer_context.py`
+- `backend/services/writer_context_service.py`
+- `tests/backend/services/test_writer_context_service.py`
+
+说明：
+
+- `next chapter preview` 可用。
+- `prompt preview` 只做本地预览，不执行 AI 生成。
+- 真正 AI 生成必须通过 `backend/ai/gateway.py`。
+- `chapter_id` 命名延续已修复。
+- `next_order` 推断已修复。
+- `pytest` 结果为 6 passed。
+- 已验证 `verify-all.ps1` 通过。
+
 ## 阶段 1：项目骨架与检查
 
 ### T010：添加基础 CI 工作流
@@ -209,6 +250,203 @@
 ```powershell
 .\scripts\verify-all.ps1
 ```
+
+## 阶段 3A：参考小说驱动原创写作
+
+### T060：修正参考小说功能定义
+
+状态：TODO
+
+负责人：Codex
+
+范围：
+
+- 将功能命名为“参考小说驱动原创写作 / Reference Novel Guided Original Writing”。
+- 明确该功能不是续写参考小说、复制参考小说、改写参考小说、搬运参考小说人物或剧情换皮。
+- 明确该功能是抽象参考小说的创作方向，再辅助生成用户自己的原创小说。
+- 只更新规划和规则文档，不写业务代码。
+
+验收：
+
+```powershell
+.\scripts\verify-all.ps1
+```
+
+### T061：设计 Reference Creation Profile 字段草案
+
+状态：TODO
+
+负责人：Codex
+
+范围：
+
+- 定义“参考创作档案 / Reference Creation Profile”。
+- 字段至少包含 `reference_title`、`genre`、`worldbuilding_pattern`、`setting_rules`、`power_system_or_core_mechanism`、`character_archetypes`、`relationship_patterns`、`conflict_patterns`、`plot_progression_model`、`chapter_structure_pattern`、`writing_style_profile`、`pacing_profile`、`emotional_tone`、`reader_hook_patterns`、`taboo_or_avoid_rules`、`originality_rules`、`target_novel_direction`。
+- 明确 Reference Creation Profile 是参考方向，Story Bible 是用户原创小说设定。
+- 不创建数据库模型，不引入依赖。
+
+验收：
+
+```powershell
+.\scripts\verify-all.ps1
+```
+
+### T062：设计参考小说导入流程
+
+状态：TODO
+
+负责人：Claude Code
+
+范围：
+
+- 设计参考小说文件导入边界和输入格式。
+- 明确导入文件只用于分析抽象，不作为 Daily Writer 直接续写来源。
+- 设计导入失败、重复导入、超大文件和编码异常的处理策略。
+- 不实现前端页面，不创建复杂后端逻辑。
+
+验收：
+
+```powershell
+.\scripts\verify-all.ps1
+```
+
+### T063：设计长文本分章和分块理解流程
+
+状态：TODO
+
+负责人：Claude Code
+
+范围：
+
+- 设计参考小说按章节、场景或长度分块的策略。
+- 设计分块摘要、跨块汇总和全书级抽象流程。
+- 明确分块理解必须通过 `backend/ai/gateway.py` 调用 AI。
+- 不实现具体 AI Provider。
+
+验收：
+
+```powershell
+.\scripts\verify-all.ps1
+```
+
+### T064：设计参考小说分析 Prompt 草案
+
+状态：TODO
+
+负责人：Codex
+
+范围：
+
+- 设计用于提取 Reference Creation Profile 的 Prompt 文件草案。
+- Prompt 必须要求抽象设定逻辑、人物类型、剧情模式、文风特征和爽点节奏。
+- Prompt 必须禁止复制原文、搬运角色名、搬运完整剧情桥段或简单换皮。
+- 不调用真实 AI，不写业务代码。
+
+验收：
+
+```powershell
+.\scripts\verify-all.ps1
+```
+
+### T065：设计从 Reference Creation Profile 生成原创 Story Bible 的流程
+
+状态：TODO
+
+负责人：Claude Code
+
+范围：
+
+- 设计用户确认 Reference Creation Profile 后生成原创 Story Bible 的流程。
+- 明确 Story Bible 中的世界观、角色、地点、时间线和风格必须属于用户原创小说。
+- 设计用户确认、修改和拒绝生成结果的节点。
+- 不创建数据库模型，不实现 API。
+
+验收：
+
+```powershell
+.\scripts\verify-all.ps1
+```
+
+### T066：设计 Daily Writer 读取 Reference Creation Profile 的规则
+
+状态：TODO
+
+负责人：Codex
+
+范围：
+
+- 明确 Daily Writer 不能直接续写参考小说。
+- Daily Writer 应读取用户原创小说的 Story Bible、用户确认过的 Reference Creation Profile、已有章节内容和本章写作目标。
+- 明确 Daily Writer 不应直接读取参考小说原文作为章节生成输入。
+- 保留章节文件存在则失败、不覆盖的硬性规则。
+
+验收：
+
+```powershell
+.\scripts\verify-all.ps1
+```
+
+### T067：设计原创性检查规则
+
+状态：TODO
+
+负责人：Codex
+
+范围：
+
+- 设计检查规则，防止直接复制参考小说原文。
+- 设计检查规则，防止把参考小说简单换皮。
+- 明确检查失败时必须阻止生成或要求人工处理。
+- 不引入外部依赖。
+
+验收：
+
+```powershell
+.\scripts\verify-all.ps1
+```
+
+### T068：设计人物不照搬检查规则
+
+状态：TODO
+
+负责人：Codex
+
+范围：
+
+- 设计检查规则，防止直接搬运参考小说角色名。
+- 设计检查规则，防止直接搬运参考小说角色组合和人物关系。
+- 明确允许抽象人物类型，不允许复制具体人物。
+- 不写业务代码。
+
+验收：
+
+```powershell
+.\scripts\verify-all.ps1
+```
+
+### T069：设计剧情不换皮检查规则
+
+状态：TODO
+
+负责人：Codex
+
+范围：
+
+- 设计检查规则，防止直接搬运参考小说完整剧情桥段。
+- 设计检查规则，防止只替换名称、地点或能力体系的剧情换皮。
+- 明确允许抽象冲突模式和章节推进方式，不允许复制具体剧情链条。
+- 不写业务代码。
+
+验收：
+
+```powershell
+.\scripts\verify-all.ps1
+```
+
+说明：
+
+- T060 至 T069 是规划和设计拆分任务。
+- 后续实现任务必须在这些任务完成后继续拆分，不能和设计任务混在一个 Pull Request 中。
 
 ## 阶段 4：Daily Writer
 
