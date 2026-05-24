@@ -64,6 +64,33 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-all.ps1
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\final-release-check.ps1
 ```
 
+## 阶段 V1 Installer：Windows MSI Installer Preview
+
+### T321-T340：NovelMind V1 Windows MSI Installer Preview
+
+状态：DONE
+
+负责人：Codex
+
+范围：
+
+- 新增 `scripts/launch-novelmind.ps1` 和 `NovelMind Launcher.bat`，用于 Windows 双击启动本地服务并打开 `http://localhost:5173`。
+- 新增 `installer/` 目录、WiX 配置和 `installer/build-msi.ps1`。
+- 新增 `scripts/check-installer.ps1`，检查安装器源码和禁止提交 MSI/EXE/ZIP 构建产物。
+- 更新 `.gitignore`，忽略 `installer/dist/`、MSI、WiX 中间文件和安装包压缩产物。
+- 更新 Windows 安装器预览文档和发布检查说明。
+- 不修改后端业务逻辑、不修改 AI Gateway、不引入桌面框架。
+
+验收：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-env.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-mvp-routes.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-all.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\final-release-check.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-installer.ps1
+```
+
 ### T002：创建最小目录骨架
 
 状态：TODO

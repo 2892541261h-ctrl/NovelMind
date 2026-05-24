@@ -11,6 +11,16 @@ V1 Final 是当前本地完整封版状态。本轮重点是 UI 中文化、浅�
 - 后端业务逻辑、AI Gateway 和 API 路径保持稳定。
 - 下一阶段可进入 Windows MSI 本地安装包打包准备。
 
+## Windows MSI Installer Preview 更新记录
+
+新增 Windows MSI 安装器预览源码，目标是提供本地安装和一键启动体验，不新增业务功能。
+
+- 新增 `scripts/launch-novelmind.ps1` 和 `NovelMind Launcher.bat`，用于启动本地后端、前端并打开 `http://localhost:5173`。
+- 新增 `installer/build-msi.ps1`、`installer/NovelMind.wxs` 和 `installer/README.md`，优先使用 WiX Toolset 构建 MSI。
+- 新增 `docs/WINDOWS_INSTALLER_GUIDE.md`，说明构建、安装、启动、依赖和 API Key 安全边界。
+- 新增 `scripts/check-installer.ps1`，检查安装器源码和禁止提交 MSI/EXE/ZIP 构建产物。
+- MSI 预览版仍依赖本机已有 PowerShell、Python 和 Node.js，不是完全离线桌面应用。
+
 NovelMind MVP 1.0 是本地可运行的长篇小说创作 MVP 封版状态。它聚焦一条完整的原创写作闭环：
 
 Reference Novel -> Reference Profile -> Writer Context -> Daily Writer -> Chapter Draft -> Edit Draft -> Publish Formal Chapter -> View Formal Chapter -> Export Markdown / TXT

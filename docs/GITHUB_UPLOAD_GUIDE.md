@@ -1,3 +1,7 @@
+# Windows Installer Preview Note
+
+If the branch includes Windows installer work, run `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-installer.ps1` before pushing. Do not commit `installer/dist/`, `.msi`, `.exe`, `.zip`, `.wixobj`, or `.wixpdb` build artifacts. If an MSI is later published, upload it manually as a GitHub Release artifact after final checks; do not store installer binaries in Git.
+
 # GitHub Upload Guide
 
 本指南用于把本地 `main` 上传到 GitHub 前的人工确认。这里只写流程，不自动 push，不创建 tag，不连接 GitHub。
