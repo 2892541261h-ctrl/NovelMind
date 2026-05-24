@@ -103,9 +103,10 @@ $dbFiles = Get-ChildItem -Path $repoRoot -Recurse -File -Include *.db,*.sqlite,*
     }
 
 if ($dbFiles) {
+    $anyTracked = $false
     foreach ($db in $dbFiles) {
-        $tracked = git ls-files --error-unmatch $db.FullName 2>$null
-        if ($LASTEXITCODE -eq 0) {
+        $output = git ls-files $db.Name 2>$null
+        if ($output) {
             Fail "Tracked database file found: $($db.FullName)"
         }
     }
