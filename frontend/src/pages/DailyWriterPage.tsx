@@ -32,6 +32,7 @@ export function DailyWriterPage() {
   const [pubLoading, setPubLoading] = useState(false);
   const [deletingDraftId, setDeletingDraftId] = useState<number | null>(null);
   const [deletingFormalId, setDeletingFormalId] = useState<number | null>(null);
+  const [v12Counts, setV12Counts] = useState<{bibles:number;cards:number;entries:number;plans:number;nextChapter:number;hasPlan:boolean}|null>(null);
 
   const loadDrafts = useCallback(async () => {
     if (!pid) { setDrafts([]); return; }
@@ -51,7 +52,25 @@ export function DailyWriterPage() {
       .then(r => r.json()).then((ns: Array<{id:number}>) => ns.length>0 ? fetch(`${BASE}/api/reference-novels/${ns[0].id}/profile`).then(r=>r.json()) : Promise.reject())
       .then(p => { setHasProfile(!!p && !p.detail); setProfileSummary(p && !p.detail ? p : null); })
       .catch(() => { setHasProfile(false); setProfileSummary(null); });
+    // v1.2 context
+    Promise.all([
+      fetch(`${BASE}/api/story-bible?project_id=${pid}`).then(r=>r.json()).catch(()=>[]),
+      fetch(`${BASE}/api/character-cards?project_id=${pid}`).then(r=>r.json()).catch(()=>[]),
+      fetch(`${BASE}/api/world-entries?project_id=${pid}`).then(r=>r.json()).catch(()=>[]),
+      fetch(`${BASE}/api/chapter-plans?project_id=${pid}`).then(r=>r.json()).catch(()=>[]),
+    ]).then(([b,c,e,p]) => {
+      const nextCh = (loadedFormalCount(pid) || 0) + 1;
+      setV12Counts({bibles:b.length,cards:c.length,entries:e.length,plans:p.length,nextChapter:nextCh,hasPlan:p.some((x:any)=>x.chapter_number===nextCh)});
+    }).catch(()=>{});
+    // update cNum to next chapter if no draft
+    fetch(`${BASE}/api/daily-writer/chapters?project_id=${pid}`).then(r=>r.json()).then((ds:any[])=>{
+      if(ds.length===0){ const next = (loadedFormalCount(pid)||0)+1; setCNum(next); }
+    }).catch(()=>{});
   }, [pid, loadDrafts, loadFormal]);
+
+  function loadedFormalCount(p: number): number {
+    return formalChs.length > 0 ? Math.max(...formalChs.map(c=>c.chapter_number)) : 0;
+  }
 
   function setProject(n: number) { setPid(n); n>0 ? localStorage.setItem("selectedProjectId", String(n)) : localStorage.removeItem("selectedProjectId"); }
 
@@ -185,6 +204,16 @@ export function DailyWriterPage() {
             <span className="text-slate-600">→</span>
             <span>导出</span>
           </div>
+
+          {v12Counts && (
+            <div className="text-xs text-slate-500 flex flex-wrap gap-x-4 gap-y-1">
+              <span>Story Bible: {v12Counts.bibles>0?`${v12Counts.bibles}`:"none"}</span>
+              <span>Character Cards: {v12Counts.cards}</span>
+              <span>World Entries: {v12Counts.entries}</span>
+              <span>Chapter Plans: {v12Counts.plans}</span>
+              <span>Next: #{v12Counts.nextChapter} {v12Counts.hasPlan?"(has plan)":""}</span>
+            </div>
+          )}
 
           <div className="flex gap-2">
             {(["generate","drafts","published"] as const).map(t => (

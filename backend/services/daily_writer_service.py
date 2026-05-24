@@ -1,18 +1,62 @@
-"""Daily Writer prompt builder —— assembles writing context for chapter generation."""
+"""Daily Writer prompt builder - v1.2: reads Story Bible + Character Cards + World Entries + Chapter Plans."""
 
 from database import SessionLocal
 from schemas.chapter_draft import ChapterDraftGenerateRequest
 from services.reference_novel_service import get_latest_profile_for_project
+from services.sb_service import list_bibles as list_bibles_svc
+from services.cc_service import list_cards
+from services.we_service import list_entries
+from services.cp_service import get_plan_by_number
 
 
 async def build_prompt(req: ChapterDraftGenerateRequest) -> tuple[str, str]:
     db = SessionLocal()
     try:
         ref_profile = get_latest_profile_for_project(db, req.project_id)
+        bibles = list_bibles_svc(db, req.project_id)
+        cards = list_cards(db, req.project_id)
+        entries = list_entries(db, req.project_id)
+        plan = get_plan_by_number(db, req.project_id, req.chapter_number)
     finally:
         db.close()
 
     system_parts = [_SYSTEM_IDENTITY]
+
+    # story bible
+    for sb in bibles[:1]:
+        system_parts.append("")
+        system_parts.append(f"== Story Bible: {sb.title} ==")
+        if sb.genre: system_parts.append(f"Genre: {sb.genre}")
+        if sb.tone: system_parts.append(f"Tone: {sb.tone}")
+        if sb.theme: system_parts.append(f"Theme: {sb.theme[:300]}")
+        if sb.world_rules: system_parts.append(f"World rules: {sb.world_rules[:300]}")
+        if sb.narrative_style: system_parts.append(f"Narrative style: {sb.narrative_style[:300]}")
+
+    # character cards
+    if cards:
+        system_parts.append("")
+        system_parts.append("== Character Cards ==")
+        for c in cards[:8]:
+            parts = [f"- {c.name}" + (f" ({c.role})" if c.role else "")]
+            if c.personality: parts.append(f"personality: {c.personality[:100]}")
+            if c.motivation: parts.append(f"motivation: {c.motivation[:100]}")
+            system_parts.append(" | ".join(parts))
+
+    # world entries
+    if entries:
+        system_parts.append("")
+        system_parts.append("== World Entries ==")
+        for e in entries[:6]:
+            system_parts.append(f"- [{e.entry_type}] {e.name}: {e.description[:120]}")
+
+    # chapter plan
+    if plan:
+        system_parts.append("")
+        system_parts.append(f"== Chapter Plan #{plan.chapter_number} ==")
+        if plan.title: system_parts.append(f"Title: {plan.title}")
+        if plan.goal: system_parts.append(f"Goal: {plan.goal[:200]}")
+        if plan.key_events: system_parts.append(f"Key events: {plan.key_events[:200]}")
+        if plan.pov_character: system_parts.append(f"POV: {plan.pov_character}")
 
     # reference profile guidance
     if ref_profile:
