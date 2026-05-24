@@ -484,6 +484,105 @@
 - T060 至 T069 是规划和设计拆分任务。
 - 后续实现任务必须在这些任务完成后继续拆分，不能和设计任务混在一个 Pull Request 中。
 
+## 阶段 3B：前端 MVP 基础
+
+### T070：前端基础工程
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- Vite + React + TypeScript + Tailwind CSS 工程配置。
+- 不引入大型 UI 库。
+- 深色主题。
+- 保证 `npm install` 和 `npm run build` 可用。
+
+产物：
+
+- `frontend/` 完整工程文件
+
+### T071：基础布局和路由
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- Sidebar 左侧导航 + Topbar + 主内容区布局。
+- react-router-dom 路由配置。
+- 导航项：Dashboard、Projects、Story Bible、Characters、Chapters、Model Settings、Daily Writer。
+
+产物：
+
+- `frontend/src/components/Layout.tsx`、`Sidebar.tsx`
+- `frontend/src/App.tsx`
+
+### T072：API Client
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- 封装 fetch 请求，默认 `http://localhost:8000`。
+- 支持 `VITE_API_BASE_URL` 环境变量。
+- 提供 Projects/Characters/Chapters 的 CRUD 方法。
+
+产物：
+
+- `frontend/src/api/client.ts`
+- `frontend/src/types/api.ts`
+
+### T073：Projects 页面接入后端 CRUD
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- 项目列表、创建、删除。
+- 项目详情页。
+- 不绕过后端直接读写数据库。
+
+产物：
+
+- `frontend/src/pages/ProjectsPage.tsx`、`ProjectDetailPage.tsx`
+
+### T074：Characters 页面接入后端 CRUD
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- 按项目列出角色、创建角色、删除角色。
+- 项目选择器状态保存到 localStorage。
+
+产物：
+
+- `frontend/src/pages/CharactersPage.tsx`
+
+### T075：Chapters 页面接入后端 CRUD
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- 按项目列出章节、创建章节、删除章节。
+- 项目选择器状态保存到 localStorage。
+
+产物：
+
+- `frontend/src/pages/ChaptersPage.tsx`
+
 ## 阶段 4：Daily Writer
 
 ### T040：设计 Daily Writer 章节命名规则
