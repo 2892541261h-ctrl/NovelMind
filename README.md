@@ -11,6 +11,28 @@ AI 长篇小说创作平台。支持多 AI Provider、Story Bible 小说设定�
 - **前端 MVP**：React + Vite + TypeScript + Tailwind CSS 深色主题界面
 - **参考小说驱动原创写作**：完整规划设计文档（`docs/` 目录）
 
+## MVP Release Candidate
+
+当前 `main` 已进入 MVP Release Candidate。核心演示链路为：
+
+Reference Novel -> Reference Profile -> Writer Context -> Daily Writer -> Chapter Draft -> Edit Draft -> Publish Formal Chapter -> View Formal Chapter -> Export Markdown / TXT
+
+当前 MVP RC 支持：
+
+- 参考小说保存与 Reference Profile 分析。
+- Daily Writer 读取项目写作上下文与 Reference Profile。
+- 章节草稿生成、列表、查看、编辑、删除和防覆盖。
+- 草稿发布为正式章节，草稿与正式章节分离。
+- 正式章节列表、详情、更新、删除。
+- Markdown / TXT 导出，默认只导出正式章节。
+- 正式章节 API 使用 `/api/formal-chapters`，避免与旧 `/api/chapters/{id}` 路由冲突。
+
+MVP 验收和演示文档：
+
+- `docs/MVP_SMOKE_TEST.md`
+- `docs/MVP_DEMO_FLOW.md`
+- `docs/RELEASE_CHECKLIST.md`
+
 ## 技术栈
 
 | 层 | 技术 |
@@ -95,6 +117,9 @@ npm run dev
 # 环境检查
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-env.ps1
 
+# MVP 路由和关键链路检查
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-mvp-routes.ps1
+
 # 全量验证（含后端编译和前端构建）
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-all.ps1
 ```
@@ -126,7 +151,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-all.ps1
 | `/chapters` | 章节管理 | 已完成 |
 | `/story-bible` | Story Bible | 占位 |
 | `/model-settings` | 模型设置 | 占位 |
-| `/daily-writer` | Daily Writer | 占位 |
+| `/daily-writer` | Daily Writer | MVP RC |
 
 ## 不要提交的文件
 
@@ -155,3 +180,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-all.ps1
 - `CHANGELOG.md` — 变更记录
 - `AGENTS.md` — AI 协作规范
 - `docs/` — 详细设计文档（参考小说分析、原创性规则等）
+- `docs/MVP_SMOKE_TEST.md` — MVP 手动验收流程
+- `docs/MVP_DEMO_FLOW.md` — MVP 演示流程
+- `docs/RELEASE_CHECKLIST.md` — Release 检查清单

@@ -34,6 +34,7 @@ $requiredFiles = @(
     "docs/DEVELOPMENT_RULES.md",
     "docs/HANDOFF_TEMPLATE.md",
     "scripts/verify-all.ps1",
+    "scripts/check-mvp-routes.ps1",
     "scripts/new-task-branch.ps1",
     "scripts/finish-task.ps1",
     ".codex/daily-code.md",
@@ -165,6 +166,13 @@ foreach ($docFile in $dailyDocFiles) {
 
 if ($dailyDocs -notmatch "backend/ai/gateway.py") {
     Fail "Docs must state: all AI calls via backend/ai/gateway.py"
+}
+
+Write-Step "check MVP route consistency"
+
+& powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\scripts\check-mvp-routes.ps1"
+if ($LASTEXITCODE -ne 0) {
+    Fail "MVP route consistency check failed"
 }
 
 Write-Step "check backend dependencies"
