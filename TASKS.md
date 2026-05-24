@@ -899,6 +899,106 @@
 - `frontend/src/pages/DailyWriterPage.tsx`
 - `TASKS.md`
 
+## 阶段 3H：v1.2 Story Bible + 连续写作基础
+
+### T301-T325：v1.2 Story Bible + Character Cards + World Entries + Chapter Plans + Continuous Writing
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- NovelStoryBible、CharacterCard、WorldEntry、ChapterPlan ORM 模型
+- 4 组完整 CRUD schema（Create/Update/ListItem/Read）
+- 4 组 CRUD service（含 ChapterPlan 防重复）
+- 4 组 REST API router（各 5 个端点）
+- StoryBiblePage 前端：Tab 式 UI（故事圣经 / 人物卡 / 世界观 / 章节计划）
+- Daily Writer prompt 扩展：读取 Story Bible、人物卡、世界观条目、章节计划
+- DailyWriterPage 前端：v1.2 上下文计数栏 + 下一章编号建议
+- main.py 挂载 4 个 router
+- check-mvp-routes.ps1 新增 v1.2 路由检查
+
+新 API（20 个端点）：
+
+- `/api/story-bible` (5: GET/POST/GET:id/PATCH:id/DELETE:id)
+- `/api/character-cards` (5)
+- `/api/world-entries` (5)
+- `/api/chapter-plans` (5)
+
+产物：
+
+- `backend/models/novel_story_bible.py`、`character_card.py`、`world_entry.py`、`chapter_plan.py`
+- `backend/schemas/story_bible_schema.py`、`character_card_schema.py`、`world_entry_schema.py`、`chapter_plan_schema.py`
+- `backend/services/sb_service.py`、`cc_service.py`、`we_service.py`、`cp_service.py`
+- `backend/routers/story_bible_routes.py`、`character_cards_routes.py`、`world_entries_routes.py`、`chapter_plans_routes.py`
+- `backend/services/daily_writer_service.py`（扩展）
+- `frontend/src/pages/StoryBiblePage.tsx`（重写）
+- `frontend/src/pages/DailyWriterPage.tsx`（扩展）
+- `backend/main.py`
+- `scripts/check-mvp-routes.ps1`
+- `TASKS.md`
+
+### T326-T340：v1.2 Continuity Enhancement
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- ChapterSummary 模型/CRUD（章节摘要、关键事件、角色变化、未解决线索）
+- PlotThread 模型/CRUD（伏笔/线索管理，status: open/developing/resolved/dropped）
+- continuity_service（snapshot 聚合）
+- Daily Writer prompt 扩展：注入最近章节摘要、未解决伏笔、连续性规则
+- StoryBiblePage 新增"章节摘要"和"伏笔"标签页
+
+新 API（10 个端点）：
+
+- `/api/chapter-summaries` (5)
+- `/api/plot-threads` (5)
+
+产物：
+
+- `backend/models/chapter_summary.py`、`plot_thread.py`
+- `backend/schemas/chapter_summary_schema.py`、`plot_thread_schema.py`
+- `backend/services/cs_service.py`、`pt_service.py`、`continuity_service.py`
+- `backend/routers/chapter_summaries_routes.py`、`plot_threads_routes.py`
+- `backend/services/daily_writer_service.py`（扩展连续性上下文）
+- `frontend/src/pages/StoryBiblePage.tsx`（扩展标签页）
+- `scripts/check-mvp-routes.ps1`
+- `TASKS.md`
+
+### T341-T358：v1.2 Writing Quality System
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- ChapterReview 模型/CRUD（7 维评分：overall/continuity/character/pacing/style/originality/goal_alignment）
+- AI-powered review（draft + formal chapter，全部通过 backend/ai/gateway.py）
+- Suggest rewrite（不自动覆盖正文，仅返回建议）
+- Continuity report/snapshot API
+- 前端质量检查按钮（Review Draft/Review Formal Chapter/Suggest Rewrite）
+- 前端评分显示（7 维分数 + issues + suggestions）
+
+新 API（7 个端点）：
+
+- `/api/chapter-reviews` (GET/DELETE + POST review-draft + POST review-formal + POST suggest-rewrite-draft)
+- `/api/continuity/report` + `/api/continuity/snapshot`
+
+产物：
+
+- `backend/models/chapter_review.py`
+- `backend/schemas/chapter_review_schema.py`
+- `backend/services/cr_service.py`
+- `backend/routers/chapter_reviews_routes.py`、`continuity_routes.py`
+- `frontend/src/pages/DailyWriterPage.tsx`（扩展 review UI）
+- `scripts/check-mvp-routes.ps1`
+- `TASKS.md`
+
 ## 阶段 3H：MVP Stabilization & Release Prep
 
 ### T181-T220：MVP 稳定性验收 + Release Prep
@@ -1049,6 +1149,64 @@ git status --short
 - `backend/services/reference_novel_service.py`
 - `frontend/src/pages/DailyWriterPage.tsx`
 - `frontend/src/pages/ReferenceNovelPage.tsx`
+- `TASKS.md`
+- `RELEASE_NOTES.md`
+- `docs/MVP_SMOKE_TEST.md`
+- `docs/MVP_DEMO_FLOW.md`
+
+## 阶段 5D：NovelMind v1.2 Story Bible / Continuity / Quality
+
+### T321-T360：Story Bible、连续写作上下文与章节质量检查
+
+状态：DONE
+
+负责工具：Claude Code + Codex
+
+范围：
+
+- 新增 Story Bible 后端基础和前端页面。
+- 新增人物卡、世界观条目、章节计划、章节摘要和伏笔/线索管理。
+- 新增 Continuity snapshot/report，展示长篇上下文状态、下一章建议和连续性健康度。
+- Daily Writer 读取 Reference Profile、Story Bible、人物卡、世界观条目、章节计划、章节摘要和未解决伏笔。
+- 新增草稿 review、正式章节 review 和草稿改写建议。
+- review 结果包含评分、issues、suggestions 和章节目标达成检查。
+- 改写建议不自动覆盖草稿正文，review 不自动发布正式章节。
+- 修复 `chapter_number` create schema 默认 0 的边界，改为必填且 `ge=1`。
+- 空草稿或空正式章节不会进入 AI review / rewrite。
+- 强化 `scripts/check-mvp-routes.ps1` 的 v1.2 路由和运行时导入检查。
+
+验收：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-env.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-mvp-routes.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-all.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\final-release-check.ps1
+git status --short
+```
+
+产物：
+
+- `backend/models/novel_story_bible.py`
+- `backend/models/character_card.py`
+- `backend/models/world_entry.py`
+- `backend/models/chapter_plan.py`
+- `backend/models/chapter_summary.py`
+- `backend/models/plot_thread.py`
+- `backend/models/chapter_review.py`
+- `backend/routers/*_routes.py`
+- `backend/services/*_service.py`
+- `backend/services/sb_service.py`
+- `backend/services/cc_service.py`
+- `backend/services/we_service.py`
+- `backend/services/cp_service.py`
+- `backend/services/cs_service.py`
+- `backend/services/pt_service.py`
+- `backend/services/cr_service.py`
+- `frontend/src/pages/StoryBiblePage.tsx`
+- `frontend/src/pages/DailyWriterPage.tsx`
+- `scripts/check-mvp-routes.ps1`
+- `README.md`
 - `TASKS.md`
 - `RELEASE_NOTES.md`
 - `docs/MVP_SMOKE_TEST.md`

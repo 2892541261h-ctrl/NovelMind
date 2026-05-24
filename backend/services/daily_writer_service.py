@@ -1,18 +1,87 @@
-"""Daily Writer prompt builder —— assembles writing context for chapter generation."""
+"""Daily Writer prompt builder - v1.2: reads Story Bible + Character Cards + World Entries + Chapter Plans."""
 
 from database import SessionLocal
 from schemas.chapter_draft import ChapterDraftGenerateRequest
 from services.reference_novel_service import get_latest_profile_for_project
+from services.sb_service import list_bibles as list_bibles_svc
+from services.cc_service import list_cards
+from services.we_service import list_entries
+from services.cp_service import get_plan_by_number
+from services.cs_service import get_recent_summaries
+from services.pt_service import get_open_threads
 
 
 async def build_prompt(req: ChapterDraftGenerateRequest) -> tuple[str, str]:
     db = SessionLocal()
     try:
         ref_profile = get_latest_profile_for_project(db, req.project_id)
+        bibles = list_bibles_svc(db, req.project_id)
+        cards = list_cards(db, req.project_id)
+        entries = list_entries(db, req.project_id)
+        plan = get_plan_by_number(db, req.project_id, req.chapter_number)
+        recent_summaries = get_recent_summaries(db, req.project_id, limit=3)
+        open_threads = get_open_threads(db, req.project_id)
     finally:
         db.close()
 
     system_parts = [_SYSTEM_IDENTITY]
+
+    # story bible
+    for sb in bibles[:1]:
+        system_parts.append("")
+        system_parts.append(f"== Story Bible: {sb.title} ==")
+        if sb.genre: system_parts.append(f"Genre: {sb.genre}")
+        if sb.tone: system_parts.append(f"Tone: {sb.tone}")
+        if sb.theme: system_parts.append(f"Theme: {sb.theme[:300]}")
+        if sb.world_rules: system_parts.append(f"World rules: {sb.world_rules[:300]}")
+        if sb.narrative_style: system_parts.append(f"Narrative style: {sb.narrative_style[:300]}")
+
+    # character cards
+    if cards:
+        system_parts.append("")
+        system_parts.append("== Character Cards ==")
+        for c in cards[:8]:
+            parts = [f"- {c.name}" + (f" ({c.role})" if c.role else "")]
+            if c.personality: parts.append(f"personality: {c.personality[:100]}")
+            if c.motivation: parts.append(f"motivation: {c.motivation[:100]}")
+            system_parts.append(" | ".join(parts))
+
+    # world entries
+    if entries:
+        system_parts.append("")
+        system_parts.append("== World Entries ==")
+        for e in entries[:6]:
+            system_parts.append(f"- [{e.entry_type}] {e.name}: {e.description[:120]}")
+
+    # chapter plan
+    if plan:
+        system_parts.append("")
+        system_parts.append(f"== Chapter Plan #{plan.chapter_number} ==")
+        if plan.title: system_parts.append(f"Title: {plan.title}")
+        if plan.goal: system_parts.append(f"Goal: {plan.goal[:200]}")
+        if plan.key_events: system_parts.append(f"Key events: {plan.key_events[:200]}")
+        if plan.pov_character: system_parts.append(f"POV: {plan.pov_character}")
+
+    # recent chapter summaries
+    if recent_summaries:
+        system_parts.append("")
+        system_parts.append("== Recent Chapter Summaries ==")
+        for s in recent_summaries:
+            summary_line = f"- Ch#{s.chapter_number}: {s.key_events[:150]}" if s.key_events else f"- Ch#{s.chapter_number}: {s.summary[:150]}"
+            if s.unresolved_threads:
+                summary_line += f" [unresolved: {s.unresolved_threads[:100]}]"
+            system_parts.append(summary_line)
+
+    # open plot threads
+    if open_threads:
+        system_parts.append("")
+        system_parts.append("== Open Plot Threads (need resolution) ==")
+        for t in open_threads[:6]:
+            system_parts.append(f"- [{t.status}] {t.title}: {t.description[:120]}")
+
+    # continuity rules
+    system_parts.append("")
+    system_parts.append(_CONTINUITY_RULES)
 
     # reference profile guidance
     if ref_profile:
@@ -69,6 +138,19 @@ _OUTPUT_RULES = (
     "4. 直接输出正文。"
     "5. 中文写作自然流畅，段落清晰。"
     "6. 每章建议 1500-3500 字，根据内容需要灵活控制。"
+    "7. 本章结尾可以留下合理钩子，但不要重复上一章内容。"
+    "8. 不要跳过关键情节推进。"
+)
+
+_CONTINUITY_RULES = (
+    "长篇连续性规则："
+    "1. 参考最近章节摘要，保持前后文连续。"
+    "2. 延续未解决伏笔，不要随意忘记。"
+    "3. 不要突然改变人物性格。"
+    "4. 不要无解释改变世界观规则。"
+    "5. 当前章节应服务于章节计划。"
+    "6. 不要重复上一章内容。"
+    "7. 不要跳过关键情节推进。"
 )
 
 _ORIGINALITY_RULES = [

@@ -35,6 +35,27 @@ MVP 验收和演示文档：
 - `docs/GITHUB_UPLOAD_GUIDE.md`
 - `RELEASE_NOTES.md`
 
+## NovelMind v1.2
+
+v1.2 在 MVP 写作闭环上补充长篇连续写作上下文和章节质量检查，仍然是本地 MVP 版本，不包含云部署、多用户、支付、多模型调度或复杂富文本编辑器。
+
+v1.2 新增：
+
+- Story Bible、人物卡、世界观条目、章节计划的 CRUD 入口。
+- 章节摘要和伏笔/线索管理，用于长篇连续性追踪。
+- Continuity snapshot/report，用于查看当前项目连续性状态、下一章建议和上下文完整度。
+- Daily Writer 会读取 Story Bible、人物卡、世界观条目、章节计划、章节摘要和未解决伏笔。
+- 章节质量检查支持草稿和正式章节 review，并返回评分、issues、suggestions 和目标达成检查。
+- 改写建议只生成参考建议，不自动覆盖草稿正文。
+- 发布前质量提醒用于辅助人工判断，不阻塞发布。
+
+v1.2 仍需遵守：
+
+- 所有 AI 调用只能通过 `backend/ai/gateway.py`。
+- 正式章节 API 继续使用 `/api/formal-chapters`，不得退回 `/api/chapters/{id}`。
+- 章节草稿和正式章节不会被自动覆盖。
+- 参考小说只用于抽象规律，不得续写、复制、搬运角色或换皮。
+
 ## MVP 1.0 Final Release Prep
 
 MVP 1.0 当前定位是本地最终封版状态，不是云部署、多用户或商业化版本。上传 GitHub 前必须先运行最终封版检查：
@@ -152,6 +173,16 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\final-release-
 | `GET /api/projects/{id}/chapters` | 章节列表 |
 | `GET /projects/demo-project/story-bible` | Story Bible |
 | `GET /projects/demo-project/writer/context` | 写作上下文预览 |
+| `GET /api/story-bible` | v1.2 Story Bible |
+| `GET /api/character-cards` | v1.2 人物卡 |
+| `GET /api/world-entries` | v1.2 世界观条目 |
+| `GET /api/chapter-plans` | v1.2 章节计划 |
+| `GET /api/chapter-summaries` | v1.2 章节摘要 |
+| `GET /api/plot-threads` | v1.2 伏笔/线索 |
+| `GET /api/continuity/snapshot` | v1.2 连续性快照 |
+| `POST /api/chapter-reviews/review-draft/{id}` | v1.2 草稿质量检查 |
+| `POST /api/chapter-reviews/review-formal/{id}` | v1.2 正式章节质量检查 |
+| `POST /api/chapter-reviews/suggest-rewrite-draft/{id}` | v1.2 草稿改写建议 |
 
 完整接口列表见各 `backend/routers/*.py`。
 
@@ -164,9 +195,9 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\final-release-
 | `/projects/:id` | 项目详情 | 已完成 |
 | `/characters` | 角色管理 | 已完成 |
 | `/chapters` | 章节管理 | 已完成 |
-| `/story-bible` | Story Bible | 占位 |
+| `/story-bible` | Story Bible / 人物卡 / 世界观 / 章节计划 / 摘要 / 伏笔 | v1.2 |
 | `/model-settings` | 模型设置 | 占位 |
-| `/daily-writer` | Daily Writer | MVP RC |
+| `/daily-writer` | Daily Writer / 连续性上下文 / 章节质量检查 | v1.2 |
 
 ## 不要提交的文件
 
