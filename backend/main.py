@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from config import settings
+from routers.ai import router as ai_router
 from routers.chapter import router as chapter_router
 from routers.health import router as health_router
 from routers.novel_project import router as novel_project_router
@@ -16,6 +17,7 @@ app = FastAPI(
 )
 
 app.include_router(health_router)
+app.include_router(ai_router)
 app.include_router(novel_project_router)
 app.include_router(project_config_router)
 app.include_router(chapter_router)
