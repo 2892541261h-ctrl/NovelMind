@@ -242,4 +242,18 @@ Require-Text "backend/services/daily_writer_service.py" "_CONTINUITY_RULES" "Con
 Require-Text "backend/services/cr_service.py" "from ai.gateway import generate_text" "Review service AI Gateway import"
 Require-Text "backend/services/cr_service.py" "originality" "Originality check in review"
 
+Write-Step "check v1.3 routes"
+
+Require-Text "backend/ai/gateway.py" "oai_compat" "oai_compat provider in gateway"
+Require-Text "backend/ai/gateway.py" "_log_usage" "Usage logging in gateway"
+Require-Text "backend/ai/gateway.py" "_estimate_cost" "Cost estimation in gateway"
+Require-Text "backend/ai/gateway.py" "api_key_env_var" "API key env var pattern in gateway"
+Reject-Text "backend/ai/gateway.py" "sk-" "Hardcoded API key pattern"
+Reject-Text "backend/ai/gateway.py" "Bearer sk-" "Hardcoded bearer token"
+Require-Text "backend/services/amc_service.py" "set_default" "Model set-default in service"
+Require-Text "backend/services/aul_service.py" "get_summary" "Usage summary in service"
+Require-Text "frontend/src/pages/AISettingsPage.tsx" "/api/ai/providers" "AI provider API in settings page"
+Require-Text "frontend/src/pages/AISettingsPage.tsx" "/api/ai/models" "AI model API in settings page"
+Require-Text "frontend/src/pages/AISettingsPage.tsx" "/api/ai/usage-logs" "Usage log API in settings page"
+
 Write-Step "all MVP route checks passed"

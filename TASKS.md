@@ -999,6 +999,43 @@
 - `scripts/check-mvp-routes.ps1`
 - `TASKS.md`
 
+## 阶段 3I：v1.3 AI Provider + Model Config + Usage Logs
+
+### T361-T383：v1.3 Real AI Provider + Model Config + Usage Logs
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- AIProviderConfig 模型/CRUD（api_key_env_var 只存变量名，不存真实 Key）
+- AIModelConfig 模型/CRUD（provider_id, model, prices, context_window, is_default, is_active）
+- AIUsageLog 模型/CRUD（feature_name, provider/model, tokens, estimated_cost, latency_ms）
+- Gateway v1.3：支持 oai_compat provider 调用 + 配置化选择 + 自动日志
+- 成本估算：基于用户配置价格 × token 用量
+- AISettingsPage：Provider + Model + Usage Log 管理
+- .env.example 新增 OPENAI_API_KEY 等占位变量
+- 所有 AI 调用仍经过 backend/ai/gateway.py
+
+新 API（14 个端点）：
+
+- `/api/ai/providers` (5)
+- `/api/ai/models` (6, incl. set-default)
+- `/api/ai/usage-logs` (3, incl. summary)
+
+产物：
+
+- `backend/models/ai_provider_config.py`、`ai_model_config.py`、`ai_usage_log.py`
+- `backend/schemas/ai_provider_config_schema.py`、`ai_model_config_schema.py`、`ai_usage_log_schema.py`
+- `backend/services/apc_service.py`、`amc_service.py`、`aul_service.py`
+- `backend/routers/ai_providers_routes.py`、`ai_models_routes.py`、`ai_usage_logs_routes.py`
+- `backend/ai/gateway.py`（增强）
+- `frontend/src/pages/AISettingsPage.tsx`
+- `.env.example`
+- `scripts/check-mvp-routes.ps1`
+- `TASKS.md`
+
 ## 阶段 3H：MVP Stabilization & Release Prep
 
 ### T181-T220：MVP 稳定性验收 + Release Prep
