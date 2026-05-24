@@ -93,6 +93,9 @@ async def generate_profile(db: Session, data: ReferenceProfileCreate) -> Referen
     )
     response = await generate_text(request)
 
+    if response.error:
+        raise ValueError(f"AI profile generation failed: {response.error}")
+
     profile_data = {
         "novel_id": data.novel_id,
         "project_id": data.project_id,
@@ -145,6 +148,8 @@ def _user_prompt(content: str) -> str:
 
 
 def _extract_section(text: str, tag: str) -> str:
+    if not text:
+        return ""
     try:
         start = text.lower().index(f"[{tag}]")
         rest = text[start + len(tag) + 2:]

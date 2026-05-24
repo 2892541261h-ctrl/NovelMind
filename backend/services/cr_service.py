@@ -39,6 +39,8 @@ async def review_content(db: Session, project_id: int, chapter_number: int, cont
         AIMessage(role="user", content=prompt),
     ])
     resp = await generate_text(ai_req)
+    if resp.error:
+        raise ValueError(f"AI review generation failed: {resp.error}")
     scores = _parse_scores(resp.content)
 
     review = ChapterReview(
@@ -59,11 +61,14 @@ async def suggest_rewrite(db: Session, content: str, issues: str, title: str) ->
         AIMessage(role="user", content=prompt),
     ])
     resp = await generate_text(ai_req)
+    if resp.error:
+        raise ValueError(f"AI rewrite suggestion failed: {resp.error}")
+    content = resp.content or ""
     return {
         "suggested_title": title,
-        "suggested_outline": _extract_section(resp.content, "outline", ""),
-        "suggested_revision_notes": _extract_section(resp.content, "notes", ""),
-        "suggested_text": _extract_section(resp.content, "text", resp.content[:500]),
+        "suggested_outline": _extract_section(content, "outline", ""),
+        "suggested_revision_notes": _extract_section(content, "notes", ""),
+        "suggested_text": _extract_section(content, "text", content[:500]),
     }
 
 
@@ -121,6 +126,8 @@ def _parse_scores(text: str) -> dict:
 
 
 def _extract_section(text: str, tag: str, default: str) -> str:
+    if not text:
+        return default
     try:
         start = text.lower().index(f"[{tag}]")
         rest = text[start + len(tag) + 2:]

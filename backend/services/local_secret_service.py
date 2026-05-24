@@ -34,7 +34,10 @@ def _read_all() -> dict:
 
 
 def _write_all(data: dict) -> None:
-    _secrets_file().write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    f = _secrets_file()
+    tmp = f.with_suffix(".tmp")
+    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp.replace(f)
 
 
 def save_api_key(provider_id: int, api_key: str) -> None:

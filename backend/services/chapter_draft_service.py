@@ -100,11 +100,11 @@ async def generate_draft(
     )
     ai_resp = await generate_text(ai_req)
 
-    if not ai_resp.content.strip():
-        raise ValueError("AI Gateway returned empty content")
-
     if ai_resp.error:
         raise ValueError(f"AI Gateway error: {ai_resp.error}")
+
+    if not ai_resp.content or not ai_resp.content.strip():
+        raise ValueError("AI Gateway returned empty content")
 
     draft_data = ChapterDraftCreate(
         project_id=req.project_id,

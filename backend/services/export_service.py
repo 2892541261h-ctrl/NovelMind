@@ -14,7 +14,7 @@ def export_markdown(project_id: int) -> str:
     for ch in chapters:
         lines.append(f"# {ch.title or f'Chapter {ch.chapter_number}'}")
         lines.append("")
-        lines.append(ch.content)
+        lines.append(ch.content or "")
         lines.append("")
         lines.append("---")
         lines.append("")
@@ -33,7 +33,7 @@ def export_txt(project_id: int) -> str:
     for ch in chapters:
         lines.append(f"{ch.title or f'Chapter {ch.chapter_number}'}")
         lines.append("")
-        lines.append(ch.content)
+        lines.append(ch.content or "")
         lines.append("")
         lines.append("=" * 40)
         lines.append("")

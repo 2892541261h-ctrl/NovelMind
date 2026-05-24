@@ -27,13 +27,11 @@ def get_dashboard_summary(project_id: int) -> dict:
         summaries = list_summaries(db, project_id)
         open_threads = get_open_threads(db, project_id)
         reviews = list_reviews(db, project_id)
-    finally:
-        db.close()
-
-    try:
-        usage = get_usage_summary(db if 'db' in dir() else SessionLocal())
+        usage = get_usage_summary(db)
     except Exception:
         usage = None
+    finally:
+        db.close()
 
     return {
         "project_id": project_id,

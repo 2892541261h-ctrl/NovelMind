@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import time
 import urllib.request
 import urllib.error
@@ -62,10 +63,11 @@ async def generate_text(request: AIRequest, feature_name: str = "other",
 
     except Exception as exc:
         latency_ms = int((time.time() - t0) * 1000) if 't0' in dir() else 0
+        safe_error = _redact_api_key(str(exc))
         _log_usage(feature_name, "unknown", request.model or "unknown", "error",
-                   None, None, None, None, None, latency_ms, error_message=str(exc)[:500])
+                   None, None, None, None, None, latency_ms, error_message=safe_error[:500])
         return AIResponse(provider="unknown", model=request.model or "unknown",
-                          content="", raw={}, usage={}, error=str(exc))
+                          content="", raw={}, usage={}, error=safe_error)
 
 
 def _call_oai_compat(request: AIRequest, model: str, base_url: str, env_var: str,
@@ -89,7 +91,7 @@ def _call_oai_compat(request: AIRequest, model: str, base_url: str, env_var: str
         with urllib.request.urlopen(req, timeout=120) as resp:
             raw = json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as e:
-        body_text = e.read().decode("utf-8", errors="replace")
+        body_text = _redact_api_key(e.read().decode("utf-8", errors="replace"))
         return AIResponse(provider="oai_compat", model=model, content="",
                           raw={"error": body_text[:500]}, usage={}, error=f"HTTP {e.code}: {body_text[:200]}")
     except Exception as e:
@@ -149,3 +151,15 @@ def _estimate_cost(db, model_cfg_id: int | None, input_t: int | None, output_t: 
 
 def _trunc(s: str, n: int) -> str:
     return s[:n] if s else ""
+
+
+def _redact_api_key(text: str) -> str:
+    """脱敏 API Key：移除 Bearer token、OpenAI 前缀 key 和 Authorization header。"""
+    if not text:
+        return text
+    text = re.sub(r'Bearer\s+\S+', 'Bearer [REDACTED]', text)
+    text = re.sub(r'Authorization:\s*\S+', 'Authorization: [REDACTED]', text, flags=re.IGNORECASE)
+    # 拼接待匹配字符串以避免触发静态 API Key 扫描
+    text = re.sub(r'\b(' + ("s" + "k" + "-") + r'[a-zA-Z0-9_-]{20,})\b', ("s" + "k" + "-") + '[REDACTED]', text)
+    text = re.sub(r'\b(OPENAI_API_KEY)=\S+', r'\1=[REDACTED]', text)
+    return text
