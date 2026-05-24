@@ -389,7 +389,7 @@
 
 ### T066：设计 Daily Writer 读取 Reference Creation Profile 的规则
 
-状态：TODO
+状态：DONE
 
 负责人：Codex
 
@@ -400,6 +400,10 @@
 - 明确 Daily Writer 不应直接读取参考小说原文作为章节生成输入。
 - 保留章节文件存在则失败、不覆盖的硬性规则。
 
+产物：
+
+- `docs/DAILY_WRITER_REFERENCE_PROFILE_RULES.md`
+
 验收：
 
 ```powershell
@@ -408,7 +412,7 @@
 
 ### T067：设计原创性检查规则
 
-状态：TODO
+状态：DONE
 
 负责人：Codex
 
@@ -419,6 +423,10 @@
 - 明确检查失败时必须阻止生成或要求人工处理。
 - 不引入外部依赖。
 
+产物：
+
+- `docs/ORIGINALITY_CHECK_RULES.md`
+
 验收：
 
 ```powershell
@@ -427,7 +435,7 @@
 
 ### T068：设计人物不照搬检查规则
 
-状态：TODO
+状态：DONE
 
 负责人：Codex
 
@@ -438,6 +446,10 @@
 - 明确允许抽象人物类型，不允许复制具体人物。
 - 不写业务代码。
 
+产物：
+
+- `docs/CHARACTER_COPY_GUARD_RULES.md`
+
 验收：
 
 ```powershell
@@ -446,7 +458,7 @@
 
 ### T069：设计剧情不换皮检查规则
 
-状态：TODO
+状态：DONE
 
 负责人：Codex
 
@@ -456,6 +468,10 @@
 - 设计检查规则，防止只替换名称、地点或能力体系的剧情换皮。
 - 明确允许抽象冲突模式和章节推进方式，不允许复制具体剧情链条。
 - 不写业务代码。
+
+产物：
+
+- `docs/PLOT_RESKIN_GUARD_RULES.md`
 
 验收：
 
