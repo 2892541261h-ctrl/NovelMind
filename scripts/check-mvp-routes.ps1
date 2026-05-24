@@ -123,14 +123,37 @@ modules = [
     "routers.formal_chapters",
     "routers.exports",
     "routers.reference_novels",
+    "routers.story_bible_routes",
+    "routers.character_cards_routes",
+    "routers.world_entries_routes",
+    "routers.chapter_plans_routes",
+    "routers.chapter_summaries_routes",
+    "routers.plot_threads_routes",
+    "routers.chapter_reviews_routes",
+    "routers.continuity_routes",
     "services.daily_writer_service",
     "services.chapter_draft_service",
     "services.formal_chapter_service",
     "services.export_service",
     "services.reference_novel_service",
+    "services.sb_service",
+    "services.cc_service",
+    "services.we_service",
+    "services.cp_service",
+    "services.cs_service",
+    "services.pt_service",
+    "services.cr_service",
+    "services.continuity_service",
     "schemas.chapter_draft",
     "schemas.formal_chapter",
     "schemas.writer_context",
+    "schemas.story_bible_schema",
+    "schemas.character_card_schema",
+    "schemas.world_entry_schema",
+    "schemas.chapter_plan_schema",
+    "schemas.chapter_summary_schema",
+    "schemas.plot_thread_schema",
+    "schemas.chapter_review_schema",
 ]
 
 for module_name in modules:
@@ -166,6 +189,24 @@ require("/api/exports/project/{project_id}/markdown", "GET", "routers.exports")
 require("/api/exports/project/{project_id}/txt", "GET", "routers.exports")
 require("/api/reference-novels", "GET", "routers.reference_novels")
 require("/api/reference-novels/{novel_id}/analyze", "POST", "routers.reference_novels")
+require("/api/story-bible", "GET", "routers.story_bible_routes")
+require("/api/story-bible", "POST", "routers.story_bible_routes")
+require("/api/character-cards", "GET", "routers.character_cards_routes")
+require("/api/character-cards", "POST", "routers.character_cards_routes")
+require("/api/world-entries", "GET", "routers.world_entries_routes")
+require("/api/world-entries", "POST", "routers.world_entries_routes")
+require("/api/chapter-plans", "GET", "routers.chapter_plans_routes")
+require("/api/chapter-plans", "POST", "routers.chapter_plans_routes")
+require("/api/chapter-summaries", "GET", "routers.chapter_summaries_routes")
+require("/api/chapter-summaries", "POST", "routers.chapter_summaries_routes")
+require("/api/plot-threads", "GET", "routers.plot_threads_routes")
+require("/api/plot-threads", "POST", "routers.plot_threads_routes")
+require("/api/chapter-reviews", "GET", "routers.chapter_reviews_routes")
+require("/api/chapter-reviews/review-draft/{draft_id}", "POST", "routers.chapter_reviews_routes")
+require("/api/chapter-reviews/review-formal/{chapter_id}", "POST", "routers.chapter_reviews_routes")
+require("/api/chapter-reviews/suggest-rewrite-draft/{draft_id}", "POST", "routers.chapter_reviews_routes")
+require("/api/continuity/report", "GET", "routers.continuity_routes")
+require("/api/continuity/snapshot", "GET", "routers.continuity_routes")
 
 for route_path, _, route_module in routes:
     if route_path.startswith("/api/chapters") and route_module.startswith("routers.formal_chapters"):
@@ -187,6 +228,10 @@ Require-Text "frontend/src/pages/DailyWriterPage.tsx" "/api/story-bible?project_
 Require-Text "frontend/src/pages/DailyWriterPage.tsx" "/api/character-cards?project_id=" "Character Cards API in DailyWriter"
 Require-Text "frontend/src/pages/DailyWriterPage.tsx" "/api/world-entries?project_id=" "World Entries API in DailyWriter"
 Require-Text "frontend/src/pages/DailyWriterPage.tsx" "/api/chapter-plans?project_id=" "Chapter Plans API in DailyWriter"
+Require-Text "frontend/src/pages/DailyWriterPage.tsx" "/api/continuity/snapshot?project_id=" "Continuity snapshot API in DailyWriter"
+Require-Text "frontend/src/pages/DailyWriterPage.tsx" "/api/chapter-reviews/review-draft/" "Review draft API in DailyWriter"
+Require-Text "frontend/src/pages/DailyWriterPage.tsx" "/api/chapter-reviews/review-formal/" "Review formal API in DailyWriter"
+Require-Text "frontend/src/pages/DailyWriterPage.tsx" "/api/chapter-reviews/suggest-rewrite-draft/" "Suggest rewrite API in DailyWriter"
 Require-Text "backend/services/daily_writer_service.py" "list_bibles" "Story Bible in prompt builder"
 Require-Text "backend/services/daily_writer_service.py" "list_cards" "Character Cards in prompt builder"
 Require-Text "backend/services/daily_writer_service.py" "list_entries" "World Entries in prompt builder"

@@ -4,6 +4,7 @@ from services.cc_service import list_cards
 from services.we_service import list_entries
 from services.cp_service import get_plan_by_number
 from services.cs_service import get_recent_summaries
+from services.formal_chapter_service import list_chapters
 from services.pt_service import get_open_threads
 
 
@@ -16,8 +17,18 @@ def get_continuity_snapshot(project_id: int, chapter_number: int) -> dict:
         plan = get_plan_by_number(db, project_id, chapter_number)
         recent = get_recent_summaries(db, project_id, limit=3)
         open_threads = get_open_threads(db, project_id)
+        chapters = list_chapters(db, project_id)
     finally:
         db.close()
+
+    latest_formal_chapter_number = max([c.chapter_number for c in chapters], default=0)
+    health_checks = [
+        len(bibles) > 0,
+        len(cards) > 0,
+        len(entries) > 0,
+        plan is not None,
+        len(recent) > 0,
+    ]
 
     return {
         "project_id": project_id,
@@ -32,4 +43,8 @@ def get_continuity_snapshot(project_id: int, chapter_number: int) -> dict:
         "recent_unresolved": [s.unresolved_threads[:120] for s in recent if s.unresolved_threads][:3],
         "open_plot_thread_count": len(open_threads),
         "open_thread_titles": [t.title for t in open_threads[:5]],
+        "latest_formal_chapter_number": latest_formal_chapter_number,
+        "next_chapter_number": latest_formal_chapter_number + 1,
+        "continuity_health_score": sum(1 for ok in health_checks if ok),
+        "continuity_health_total": len(health_checks),
     }

@@ -25,6 +25,7 @@ def delete_review(review_id: int, db: Session = Depends(get_db)):
 async def review_draft(draft_id: int, db: Session = Depends(get_db)):
     d = chapter_draft_service.get_draft(db, draft_id)
     if not d: raise HTTPException(404, "Draft not found")
+    if not d.content.strip(): raise HTTPException(400, "Draft content is empty")
     return await cr_service.review_content(db, d.project_id, d.chapter_number, d.content,
         draft_id=d.id, writing_goal=d.writing_goal)
 
@@ -32,6 +33,7 @@ async def review_draft(draft_id: int, db: Session = Depends(get_db)):
 async def review_formal(chapter_id: int, db: Session = Depends(get_db)):
     ch = formal_chapter_service.get_chapter(db, chapter_id)
     if not ch: raise HTTPException(404, "Chapter not found")
+    if not ch.content.strip(): raise HTTPException(400, "Chapter content is empty")
     return await cr_service.review_content(db, ch.project_id, ch.chapter_number, ch.content,
         formal_chapter_id=ch.id)
 
@@ -39,6 +41,7 @@ async def review_formal(chapter_id: int, db: Session = Depends(get_db)):
 async def suggest_rewrite(draft_id: int, db: Session = Depends(get_db)):
     d = chapter_draft_service.get_draft(db, draft_id)
     if not d: raise HTTPException(404, "Draft not found")
+    if not d.content.strip(): raise HTTPException(400, "Draft content is empty")
     reviews = cr_service.list_reviews(db, d.project_id)
     relevant = [r for r in reviews if r.chapter_number == d.chapter_number]
     issues = "\n".join([r.issues for r in relevant]) if relevant else ""

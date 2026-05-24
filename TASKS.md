@@ -1154,6 +1154,64 @@ git status --short
 - `docs/MVP_SMOKE_TEST.md`
 - `docs/MVP_DEMO_FLOW.md`
 
+## 阶段 5D：NovelMind v1.2 Story Bible / Continuity / Quality
+
+### T321-T360：Story Bible、连续写作上下文与章节质量检查
+
+状态：DONE
+
+负责工具：Claude Code + Codex
+
+范围：
+
+- 新增 Story Bible 后端基础和前端页面。
+- 新增人物卡、世界观条目、章节计划、章节摘要和伏笔/线索管理。
+- 新增 Continuity snapshot/report，展示长篇上下文状态、下一章建议和连续性健康度。
+- Daily Writer 读取 Reference Profile、Story Bible、人物卡、世界观条目、章节计划、章节摘要和未解决伏笔。
+- 新增草稿 review、正式章节 review 和草稿改写建议。
+- review 结果包含评分、issues、suggestions 和章节目标达成检查。
+- 改写建议不自动覆盖草稿正文，review 不自动发布正式章节。
+- 修复 `chapter_number` create schema 默认 0 的边界，改为必填且 `ge=1`。
+- 空草稿或空正式章节不会进入 AI review / rewrite。
+- 强化 `scripts/check-mvp-routes.ps1` 的 v1.2 路由和运行时导入检查。
+
+验收：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-env.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-mvp-routes.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-all.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\final-release-check.ps1
+git status --short
+```
+
+产物：
+
+- `backend/models/novel_story_bible.py`
+- `backend/models/character_card.py`
+- `backend/models/world_entry.py`
+- `backend/models/chapter_plan.py`
+- `backend/models/chapter_summary.py`
+- `backend/models/plot_thread.py`
+- `backend/models/chapter_review.py`
+- `backend/routers/*_routes.py`
+- `backend/services/*_service.py`
+- `backend/services/sb_service.py`
+- `backend/services/cc_service.py`
+- `backend/services/we_service.py`
+- `backend/services/cp_service.py`
+- `backend/services/cs_service.py`
+- `backend/services/pt_service.py`
+- `backend/services/cr_service.py`
+- `frontend/src/pages/StoryBiblePage.tsx`
+- `frontend/src/pages/DailyWriterPage.tsx`
+- `scripts/check-mvp-routes.ps1`
+- `README.md`
+- `TASKS.md`
+- `RELEASE_NOTES.md`
+- `docs/MVP_SMOKE_TEST.md`
+- `docs/MVP_DEMO_FLOW.md`
+
 ## 阶段 4：Daily Writer
 
 ### T040：设计 Daily Writer 章节命名规则

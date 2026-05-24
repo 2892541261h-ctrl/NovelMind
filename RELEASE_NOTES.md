@@ -15,6 +15,19 @@ v1.1 是 MVP 1.0 之后的本地稳定性与体验增强版本，重点不是新
 - 增强 `Daily Writer` prompt 的中文写作质量要求，继续禁止续写、复制、搬运角色/地名/组织名/剧情事件或简单换皮。
 - 增强 Reference Profile 分析 prompt，强调只提取抽象创作规律，不输出原文搬运或具体剧情链条。
 
+## v1.2 更新记录
+
+v1.2 是 Story Bible、连续写作和章节质量检查增强版本。它继续保持本地 MVP 边界，不新增云部署、多用户、支付、多模型调度或复杂富文本编辑器。
+
+- 新增 Story Bible 后端与前端入口，支持 Story Bible、人物卡、世界观条目和章节计划。
+- 新增章节摘要与伏笔/线索管理，供 Daily Writer 读取最近章节摘要和未解决伏笔。
+- 新增 Continuity snapshot/report，用于展示下一章建议、上下文完整度和连续性健康度。
+- Daily Writer prompt 读取 Reference Profile、Story Bible、人物卡、世界观条目、章节计划、章节摘要和 Plot Threads。
+- 新增章节质量检查：草稿 review、正式章节 review、目标达成检查、人物一致性检查、原创性风险提示和伏笔推进提醒。
+- 新增草稿改写建议，建议内容不会自动覆盖草稿正文。
+- 继续保留所有 AI 调用必须通过 `backend/ai/gateway.py` 的规则。
+- 继续保持正式章节 API 使用 `/api/formal-chapters`，草稿 API 使用 `/api/daily-writer/chapters`。
+
 ## 当前能力
 
 - Windows 本地启动后端和前端。

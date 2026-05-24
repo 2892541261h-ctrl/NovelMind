@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 
 
 class ChapterSummaryCreate(BaseModel):
-    project_id: int; chapter_number: int = Field(default=0, ge=1)
+    project_id: int; chapter_number: int = Field(..., ge=1)
     chapter_id: int | None = None
     summary: str = Field(default="")
     key_events: str = Field(default="")

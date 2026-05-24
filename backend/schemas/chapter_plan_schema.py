@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 
 
 class ChapterPlanCreate(BaseModel):
-    project_id: int; chapter_number: int = Field(default=0, ge=1)
+    project_id: int; chapter_number: int = Field(..., ge=1)
     title: str = Field(default="", max_length=200)
     goal: str = Field(default="")
     key_events: str = Field(default="")

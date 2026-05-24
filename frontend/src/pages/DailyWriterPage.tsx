@@ -7,6 +7,7 @@ interface DraftRead extends DraftItem { content: string; writing_goal: string; p
 interface FormalItem { id: number; project_id: number; chapter_number: number; title: string; status: string; word_count: number; published_at: string | null; created_at: string; updated_at: string; }
 interface FormalRead extends FormalItem { content: string; source_draft_id: number | null; }
 interface ProfileSummary { genre: string; worldbuilding_pattern: string; writing_style_profile: string; target_novel_direction: string; }
+interface ContinuitySnapshot { continuity_health_score: number; continuity_health_total: number; latest_formal_chapter_number: number; next_chapter_number: number; recent_summary_count: number; open_plot_thread_count: number; plan_title: string; plan_goal: string; }
 
 export function DailyWriterPage() {
   const [pid, setPid] = useState<number>(() => Number(localStorage.getItem("selectedProjectId")) || 0);
@@ -33,6 +34,7 @@ export function DailyWriterPage() {
   const [deletingDraftId, setDeletingDraftId] = useState<number | null>(null);
   const [deletingFormalId, setDeletingFormalId] = useState<number | null>(null);
   const [v12Counts, setV12Counts] = useState<{bibles:number;cards:number;entries:number;plans:number;nextChapter:number;hasPlan:boolean}|null>(null);
+  const [continuity, setContinuity] = useState<ContinuitySnapshot | null>(null);
   const [reviewing, setReviewing] = useState(false);
   const [reviewResult, setReviewResult] = useState<any>(null);
   const [rewriting, setRewriting] = useState(false);
@@ -49,8 +51,9 @@ export function DailyWriterPage() {
   }, [pid]);
 
   useEffect(() => {
-    if (!pid) { setDrafts([]); setSelDraft(null); setFormalChs([]); setSelFormal(null); setHasProfile(null); setProfileSummary(null); return; }
+    if (!pid) { setDrafts([]); setSelDraft(null); setFormalChs([]); setSelFormal(null); setHasProfile(null); setProfileSummary(null); setV12Counts(null); setContinuity(null); return; }
     setError(null); setSuccess(null);
+    setV12Counts(null); setContinuity(null);
     loadDrafts(); loadFormal();
     fetch(`${BASE}/api/reference-novels?project_id=${pid}`)
       .then(r => r.json()).then((ns: Array<{id:number}>) => ns.length>0 ? fetch(`${BASE}/api/reference-novels/${ns[0].id}/profile`).then(r=>r.json()) : Promise.reject())
@@ -62,19 +65,18 @@ export function DailyWriterPage() {
       fetch(`${BASE}/api/character-cards?project_id=${pid}`).then(r=>r.json()).catch(()=>[]),
       fetch(`${BASE}/api/world-entries?project_id=${pid}`).then(r=>r.json()).catch(()=>[]),
       fetch(`${BASE}/api/chapter-plans?project_id=${pid}`).then(r=>r.json()).catch(()=>[]),
-    ]).then(([b,c,e,p]) => {
-      const nextCh = (loadedFormalCount(pid) || 0) + 1;
+      fetch(`${BASE}/api/formal-chapters?project_id=${pid}`).then(r=>r.json()).catch(()=>[]),
+      fetch(`${BASE}/api/daily-writer/chapters?project_id=${pid}`).then(r=>r.json()).catch(()=>[]),
+    ]).then(([b,c,e,p,formal,ds]) => {
+      const latestFormal = formal.length > 0 ? Math.max(...formal.map((ch:any)=>ch.chapter_number || 0)) : 0;
+      const nextCh = latestFormal + 1;
       setV12Counts({bibles:b.length,cards:c.length,entries:e.length,plans:p.length,nextChapter:nextCh,hasPlan:p.some((x:any)=>x.chapter_number===nextCh)});
-    }).catch(()=>{});
-    // update cNum to next chapter if no draft
-    fetch(`${BASE}/api/daily-writer/chapters?project_id=${pid}`).then(r=>r.json()).then((ds:any[])=>{
-      if(ds.length===0){ const next = (loadedFormalCount(pid)||0)+1; setCNum(next); }
+      if(ds.length===0) setCNum(nextCh);
+      return fetch(`${BASE}/api/continuity/snapshot?project_id=${pid}&chapter_number=${nextCh}`);
+    }).then(r => r && r.ok ? r.json() : null).then(s => {
+      if (s) setContinuity(s);
     }).catch(()=>{});
   }, [pid, loadDrafts, loadFormal]);
-
-  function loadedFormalCount(p: number): number {
-    return formalChs.length > 0 ? Math.max(...formalChs.map(c=>c.chapter_number)) : 0;
-  }
 
   function setProject(n: number) { setPid(n); n>0 ? localStorage.setItem("selectedProjectId", String(n)) : localStorage.removeItem("selectedProjectId"); }
 
@@ -252,6 +254,9 @@ export function DailyWriterPage() {
               <span>World Entries: {v12Counts.entries}</span>
               <span>Chapter Plans: {v12Counts.plans}</span>
               <span>Next: #{v12Counts.nextChapter} {v12Counts.hasPlan?"(has plan)":""}</span>
+              {continuity && <span>Continuity: {continuity.continuity_health_score}/{continuity.continuity_health_total}</span>}
+              {continuity?.plan_title && <span>Plan: {continuity.plan_title.slice(0, 40)}</span>}
+              {continuity && <span>Summaries: {continuity.recent_summary_count} · Threads: {continuity.open_plot_thread_count}</span>}
             </div>
           )}
 

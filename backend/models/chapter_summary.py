@@ -9,7 +9,7 @@ class ChapterSummary(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     project_id: Mapped[int] = mapped_column(Integer, ForeignKey("projects.id"), nullable=False)
     chapter_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    chapter_number: Mapped[int] = mapped_column(Integer, default=0)
+    chapter_number: Mapped[int] = mapped_column(Integer, default=1)
     summary: Mapped[str] = mapped_column(Text, default="")
     key_events: Mapped[str] = mapped_column(Text, default="")
     character_changes: Mapped[str] = mapped_column(Text, default="")
