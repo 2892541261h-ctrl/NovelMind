@@ -76,6 +76,47 @@
 .\scripts\verify-all.ps1
 ```
 
+### T007：Project Config 只读配置接口基础
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- `backend/routers/project_config.py`
+- `backend/schemas/project_config.py`
+- `backend/services/project_config_service.py`
+- `backend/main.py`
+
+说明：
+
+- 已接入 FastAPI。
+- 已验证 `verify-all.ps1` 通过。
+
+### T008：Writer Context 只读上下文预览基础
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- `backend/routers/writer.py`
+- `backend/schemas/writer_context.py`
+- `backend/services/writer_context_service.py`
+- `tests/backend/services/test_writer_context_service.py`
+
+说明：
+
+- `next chapter preview` 可用。
+- `prompt preview` 只做本地预览，不执行 AI 生成。
+- 真正 AI 生成必须通过 `backend/ai/gateway.py`。
+- `chapter_id` 命名延续已修复。
+- `next_order` 推断已修复。
+- `pytest` 结果为 6 passed。
+- 已验证 `verify-all.ps1` 通过。
+
 ## 阶段 1：项目骨架与检查
 
 ### T010：添加基础 CI 工作流
