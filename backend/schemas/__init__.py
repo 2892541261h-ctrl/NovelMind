@@ -7,6 +7,13 @@ from .novel_project import (
     ProjectFiles,
     ProjectPaths,
 )
+from .project_config import (
+    AutomationConfig,
+    OutlineConfig,
+    StyleProfileConfig,
+    SummariesList,
+    SummaryFileEntry,
+)
 from .story_bible import (
     CharacterProfile,
     LocationProfile,
@@ -16,19 +23,34 @@ from .story_bible import (
     StyleProfile,
     WorldRule,
 )
+from .writer_context import (
+    NextChapterPreview,
+    PromptPreview,
+    WriterContext,
+    WriterContextWarning,
+)
 
 __all__ = [
+    "AutomationConfig",
     "ChapterContent",
     "ChapterSummary",
     "CharacterProfile",
     "LocationProfile",
+    "NextChapterPreview",
     "NovelProjectDetail",
     "NovelProjectSummary",
+    "OutlineConfig",
     "PlotThread",
     "ProjectFiles",
     "ProjectPaths",
+    "PromptPreview",
     "StoryBible",
     "StoryMetadata",
     "StyleProfile",
+    "StyleProfileConfig",
+    "SummariesList",
+    "SummaryFileEntry",
     "WorldRule",
+    "WriterContext",
+    "WriterContextWarning",
 ]

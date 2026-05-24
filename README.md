@@ -80,6 +80,39 @@ Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/chapters
 Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/chapters/ch01
 ```
 
+## 项目配置读取 API
+
+读取项目配置文件，均为只读：
+
+```powershell
+# 大纲
+Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/outline
+
+# 写作风格
+Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/style-profile
+
+# 自动化配置
+Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/automation
+
+# 摘要文件列表
+Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/summaries
+```
+
+## Writer Context API
+
+写作上下文预览（组合已有信息，只读，不生成正文）：
+
+```powershell
+# 完整写作上下文
+Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/writer/context
+
+# 下一章预览（不创建文件）
+Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/writer/next-chapter-preview
+
+# Mock prompt 预览（uses_real_ai=false）
+Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/writer/prompt-preview
+```
+
 ## Story Bible
 
 Story Bible 是一个小说项目的完整设定文件，包含角色、地点、世界规则、剧情线和写作风格。以结构化 JSON 方式存储于 `novels/{project_id}/story-bible.json`。
