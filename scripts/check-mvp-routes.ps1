@@ -194,5 +194,7 @@ Require-Text "backend/services/daily_writer_service.py" "get_plan_by_number" "Ch
 Require-Text "backend/services/daily_writer_service.py" "get_recent_summaries" "Chapter summaries in prompt builder"
 Require-Text "backend/services/daily_writer_service.py" "get_open_threads" "Plot threads in prompt builder"
 Require-Text "backend/services/daily_writer_service.py" "_CONTINUITY_RULES" "Continuity rules in prompt builder"
+Require-Text "backend/services/cr_service.py" "from ai.gateway import generate_text" "Review service AI Gateway import"
+Require-Text "backend/services/cr_service.py" "originality" "Originality check in review"
 
 Write-Step "all MVP route checks passed"

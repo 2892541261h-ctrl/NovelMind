@@ -969,6 +969,36 @@
 - `scripts/check-mvp-routes.ps1`
 - `TASKS.md`
 
+### T341-T358：v1.2 Writing Quality System
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- ChapterReview 模型/CRUD（7 维评分：overall/continuity/character/pacing/style/originality/goal_alignment）
+- AI-powered review（draft + formal chapter，全部通过 backend/ai/gateway.py）
+- Suggest rewrite（不自动覆盖正文，仅返回建议）
+- Continuity report/snapshot API
+- 前端质量检查按钮（Review Draft/Review Formal Chapter/Suggest Rewrite）
+- 前端评分显示（7 维分数 + issues + suggestions）
+
+新 API（7 个端点）：
+
+- `/api/chapter-reviews` (GET/DELETE + POST review-draft + POST review-formal + POST suggest-rewrite-draft)
+- `/api/continuity/report` + `/api/continuity/snapshot`
+
+产物：
+
+- `backend/models/chapter_review.py`
+- `backend/schemas/chapter_review_schema.py`
+- `backend/services/cr_service.py`
+- `backend/routers/chapter_reviews_routes.py`、`continuity_routes.py`
+- `frontend/src/pages/DailyWriterPage.tsx`（扩展 review UI）
+- `scripts/check-mvp-routes.ps1`
+- `TASKS.md`
+
 ## 阶段 3H：MVP Stabilization & Release Prep
 
 ### T181-T220：MVP 稳定性验收 + Release Prep
