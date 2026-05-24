@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import String, Integer, DateTime, ForeignKey, func
+from sqlalchemy import String, Integer, DateTime, ForeignKey, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from database import Base
@@ -13,9 +13,9 @@ class Chapter(Base):
     project_id: Mapped[int] = mapped_column(Integer, ForeignKey("projects.id"), nullable=False)
     chapter_number: Mapped[int] = mapped_column(Integer, default=0)
     title: Mapped[str] = mapped_column(String(200), default="")
-    goal: Mapped[str] = mapped_column(String(2000), default="")
-    summary: Mapped[str] = mapped_column(String(5000), default="")
-    content: Mapped[str] = mapped_column(String(50000), default="")
+    goal: Mapped[str] = mapped_column(Text, default="")
+    summary: Mapped[str] = mapped_column(Text, default="")
+    content: Mapped[str] = mapped_column(Text, default="")
     involved_characters: Mapped[str] = mapped_column(String(2000), default="")
     location: Mapped[str] = mapped_column(String(500), default="")
     conflict: Mapped[str] = mapped_column(String(2000), default="")
