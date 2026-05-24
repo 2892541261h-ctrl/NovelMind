@@ -16,6 +16,7 @@
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-env.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-mvp-routes.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-all.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\final-release-check.ps1
 ```
 
 通过标准：
@@ -23,6 +24,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-all.ps1
 - `check-env.ps1` 可完成检查
 - `check-mvp-routes.ps1` 输出 all MVP route checks passed
 - `verify-all.ps1` 输出 all checks passed
+- `final-release-check.ps1` 输出 MVP 1.0 final release check passed
 - 后端编译 OK
 - 前端构建 OK
 

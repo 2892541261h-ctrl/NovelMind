@@ -32,6 +32,18 @@ MVP 验收和演示文档：
 - `docs/MVP_SMOKE_TEST.md`
 - `docs/MVP_DEMO_FLOW.md`
 - `docs/RELEASE_CHECKLIST.md`
+- `docs/GITHUB_UPLOAD_GUIDE.md`
+- `RELEASE_NOTES.md`
+
+## MVP 1.0 Final Release Prep
+
+MVP 1.0 当前定位是本地最终封版状态，不是云部署、多用户或商业化版本。上传 GitHub 前必须先运行最终封版检查：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\final-release-check.ps1
+```
+
+不要跳过检查直接 push。上传前流程见 `docs/GITHUB_UPLOAD_GUIDE.md`，版本说明见 `RELEASE_NOTES.md`。
 
 ## 技术栈
 
@@ -122,6 +134,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-mvp-routes.p
 
 # 全量验证（含后端编译和前端构建）
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-all.ps1
+
+# MVP 1.0 最终封版检查
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\final-release-check.ps1
 ```
 
 ## 后端接口
@@ -183,3 +198,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-all.ps1
 - `docs/MVP_SMOKE_TEST.md` — MVP 手动验收流程
 - `docs/MVP_DEMO_FLOW.md` — MVP 演示流程
 - `docs/RELEASE_CHECKLIST.md` — Release 检查清单
+- `docs/GITHUB_UPLOAD_GUIDE.md` — GitHub 上传前指南
+- `docs/MVP_ACCEPTANCE_REPORT_TEMPLATE.md` — MVP 验收记录模板
+- `RELEASE_NOTES.md` — MVP 1.0 版本说明
