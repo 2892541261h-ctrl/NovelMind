@@ -13,17 +13,21 @@ interface PlanRead extends PlanItem { key_events: string; pov_character: string;
 
 export function StoryBiblePage() {
   const [pid, setPid] = useState<number>(() => Number(localStorage.getItem("selectedProjectId")) || 0);
-  const [tab, setTab] = useState<"bible"|"cards"|"entries"|"plans">("bible");
+  const [tab, setTab] = useState<"bible"|"cards"|"entries"|"plans"|"summaries"|"threads">("bible");
 
   const [bibles, setBibles] = useState<BibleItem[]>([]);
   const [cards, setCards] = useState<CardItem[]>([]);
   const [entries, setEntries] = useState<EntryItem[]>([]);
   const [plans, setPlans] = useState<PlanItem[]>([]);
+  const [summaries, setSummaries] = useState<any[]>([]);
+  const [threads, setThreads] = useState<any[]>([]);
 
   const [selBible, setSelBible] = useState<BibleRead | null>(null);
   const [selCard, setSelCard] = useState<CardRead | null>(null);
   const [selEntry, setSelEntry] = useState<EntryRead | null>(null);
   const [selPlan, setSelPlan] = useState<PlanRead | null>(null);
+  const [selSummary, setSelSummary] = useState<any | null>(null);
+  const [selThread, setSelThread] = useState<any | null>(null);
 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -43,6 +47,8 @@ export function StoryBiblePage() {
     fetcher("/api/character-cards", setCards);
     fetcher("/api/world-entries", setEntries);
     fetcher("/api/chapter-plans", setPlans);
+    fetcher("/api/chapter-summaries", setSummaries);
+    fetcher("/api/plot-threads", setThreads);
   }, [pid, fetcher]);
 
   const tabDefs = [
@@ -50,6 +56,8 @@ export function StoryBiblePage() {
     { key: "cards" as const, label: `人物卡 (${cards.length})`, count: cards.length },
     { key: "entries" as const, label: `世界观 (${entries.length})`, count: entries.length },
     { key: "plans" as const, label: `章节计划 (${plans.length})`, count: plans.length },
+    { key: "summaries" as const, label: `章节摘要 (${summaries.length})`, count: summaries.length },
+    { key: "threads" as const, label: `伏笔 (${threads.length})`, count: threads.length },
   ];
 
   function setProject(n: number) { setPid(n); if (n>0) localStorage.setItem("selectedProjectId", String(n)); else localStorage.removeItem("selectedProjectId"); }
@@ -129,7 +137,11 @@ export function StoryBiblePage() {
                 onEdit={() => { detail("/api/world-entries", e.id, setSelEntry); setEditing(true); }} onDel={() => del("/api/world-entries", e.id, "entry")} />)}
               {tab === "plans" && plans.map(p => <Item key={p.id} title={`#${p.chapter_number} ${p.title||"untitled"}`} sub={p.status} active={selPlan?.id===p.id} onClick={() => detail("/api/chapter-plans", p.id, setSelPlan)}
                 onEdit={() => { detail("/api/chapter-plans", p.id, setSelPlan); setEditing(true); }} onDel={() => del("/api/chapter-plans", p.id, "plan")} />)}
-              {((tab==="bible"&&bibles.length===0)||(tab==="cards"&&cards.length===0)||(tab==="entries"&&entries.length===0)||(tab==="plans"&&plans.length===0)) && <p className="text-xs text-slate-600 p-3">no entries</p>}
+              {tab === "summaries" && summaries.map((s:any) => <Item key={s.id} title={`#${s.chapter_number} summary`} sub={s.key_events?.slice(0,60)||""} active={selSummary?.id===s.id} onClick={() => detail("/api/chapter-summaries", s.id, setSelSummary)}
+                onEdit={() => { detail("/api/chapter-summaries", s.id, setSelSummary); setEditing(true); }} onDel={() => del("/api/chapter-summaries", s.id, "summary")} />)}
+              {tab === "threads" && threads.map((t:any) => <Item key={t.id} title={t.title||"untitled"} sub={`${t.status} · ch${t.introduced_chapter||"?"}`} active={selThread?.id===t.id} onClick={() => detail("/api/plot-threads", t.id, setSelThread)}
+                onEdit={() => { detail("/api/plot-threads", t.id, setSelThread); setEditing(true); }} onDel={() => del("/api/plot-threads", t.id, "thread")} />)}
+              {((tab==="bible"&&bibles.length===0)||(tab==="cards"&&cards.length===0)||(tab==="entries"&&entries.length===0)||(tab==="plans"&&plans.length===0)||(tab==="summaries"&&summaries.length===0)||(tab==="threads"&&threads.length===0)) && <p className="text-xs text-slate-600 p-3">no entries</p>}
             </div>
 
             <div className="lg:col-span-3">
@@ -137,7 +149,9 @@ export function StoryBiblePage() {
               {tab==="cards"&&selCard && <DetailCard data={selCard} />}
               {tab==="entries"&&selEntry && <DetailEntry data={selEntry} />}
               {tab==="plans"&&selPlan && <DetailPlan data={selPlan} />}
-              {!selBible&&!selCard&&!selEntry&&!selPlan && <Placeholder text="select an item" />}
+              {tab==="summaries"&&selSummary && <DetailSummary data={selSummary} />}
+              {tab==="threads"&&selThread && <DetailThread data={selThread} />}
+              {!selBible&&!selCard&&!selEntry&&!selPlan&&!selSummary&&!selThread && <Placeholder text="select an item" />}
             </div>
           </div>
         </>
@@ -188,7 +202,7 @@ function Placeholder({ text }: { text: string }) { return <div className="rounde
 
 function FormPopup({ tab, pid, onSave, onCancel, saving, editData }: { tab: string; pid: number; onSave: (path: string, body: object) => void; onCancel: () => void; saving: boolean; editData: any; }) {
   const isEdit = !!editData;
-  const prefix = tab==="bible"?"/api/story-bible":tab==="cards"?"/api/character-cards":tab==="entries"?"/api/world-entries":"/api/chapter-plans";
+  const prefix = tab==="bible"?"/api/story-bible":tab==="cards"?"/api/character-cards":tab==="entries"?"/api/world-entries":tab==="plans"?"/api/chapter-plans":tab==="summaries"?"/api/chapter-summaries":"/api/plot-threads";
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -206,6 +220,8 @@ function FormPopup({ tab, pid, onSave, onCancel, saving, editData }: { tab: stri
       {tab === "cards" && <><Input name="name" label="name" /><Input name="role" label="role" /><TA name="personality" label="personality" /><TA name="motivation" label="motivation" /><TA name="conflict" label="conflict" /><TA name="relationship_notes" label="relationships" /><TA name="arc" label="arc" /></>}
       {tab === "entries" && <><Input name="name" label="name" /><Input name="entry_type" label="type" placeholder="location/organization/rule/item/culture/other" /><TA name="description" label="description" /><TA name="rules" label="rules" /><Input name="importance" label="importance" placeholder="high/medium/low" /></>}
       {tab === "plans" && <><Input name="chapter_number" label="chapter number" type="number" /><Input name="title" label="title" /><TA name="goal" label="goal" /><TA name="key_events" label="key events" /><Input name="pov_character" label="POV character" /><Input name="status" label="status" placeholder="planned/in_progress/done" /></>}
+      {tab === "summaries" && <><Input name="chapter_number" label="chapter number" type="number" /><TA name="summary" label="summary" /><TA name="key_events" label="key events" /><TA name="character_changes" label="character changes" /><TA name="unresolved_threads" label="unresolved threads" /></>}
+      {tab === "threads" && <><Input name="title" label="title" /><TA name="description" label="description" /><Input name="status" label="status" placeholder="open/developing/resolved/dropped" /><Input name="introduced_chapter" label="introduced chapter" type="number" /><Input name="resolved_chapter" label="resolved chapter" type="number" /><TA name="notes" label="notes" /></>}
       <div className="flex gap-2">
         <button type="submit" disabled={saving} className="rounded bg-cyan-600 px-4 py-2 text-sm text-white hover:bg-cyan-700 disabled:opacity-50">{saving?"saving...":"save"}</button>
         <button type="button" onClick={onCancel} className="rounded border border-slate-700 px-4 py-2 text-sm text-slate-400 hover:text-white">cancel</button>
@@ -218,4 +234,18 @@ function Input({ name, label, type, placeholder }: { name: string; label: string
 }
 function TA({ name, label }: { name: string; label: string }) {
   return <label className="block text-xs text-slate-500 space-y-1">{label} <textarea name={name} rows={3} className="w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white" /></label>;
+}
+function DetailSummary({ data }: { data: any }) {
+  return <div className="rounded-lg border border-slate-800 bg-slate-900 p-5 space-y-3">
+    <h3 className="font-semibold">#{data.chapter_number} 章节摘要</h3>
+    <F label="summary" v={data.summary} /><F label="key events" v={data.key_events} /><F label="character changes" v={data.character_changes} /><F label="unresolved threads" v={data.unresolved_threads} />
+  </div>;
+}
+function DetailThread({ data }: { data: any }) {
+  return <div className="rounded-lg border border-slate-800 bg-slate-900 p-5 space-y-3">
+    <h3 className="font-semibold">{data.title||"untitled"} <span className="text-xs text-slate-500">{data.status}</span></h3>
+    <F label="description" v={data.description} />
+    <div className="text-xs text-slate-500">introduced ch: {data.introduced_chapter||"-"} · resolved ch: {data.resolved_chapter||"-"}</div>
+    <F label="notes" v={data.notes} />
+  </div>;
 }
