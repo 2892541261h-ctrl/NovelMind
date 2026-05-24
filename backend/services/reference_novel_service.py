@@ -123,24 +123,24 @@ async def generate_profile(db: Session, data: ReferenceProfileCreate) -> Referen
 
 def _system_prompt() -> str:
     return (
-        "You analyze reference novels to extract creative patterns. "
-        "Do NOT copy original text, character names, or plot events. "
-        "Abstract only: genre, worldbuilding, character types, conflict types, "
-        "writing style, plot progression, and creative direction."
+        "你是参考小说创作规律分析师。你的唯一任务是从参考小说中提取抽象创作规律。"
+        "你不是续写作家，不是同人作者，不是翻译。你是规律分析师。"
+        "只能提取抽象规律：流派类型、世界观构建方式、人物原型类型、冲突模式类型、写作风格特征、情节推进模式、创作方向建议。"
+        "严禁复制原文、搬运角色名/地名/组织名、搬运完整剧情桥段、简单换皮。"
     )
 
 
 def _user_prompt(content: str) -> str:
     return (
-        "Analyze this reference novel text and extract:\n"
-        "1. [worldbuilding] Setting and world rules pattern\n"
-        "2. [characters] Character archetypes and relationship patterns\n"
-        "3. [conflict] Conflict types and resolution patterns\n"
-        "4. [style] Writing style and narrative techniques\n"
-        "5. [plot] Plot progression model\n"
-        "6. [direction] Suggested original creative direction\n\n"
-        "Respond with clear section headers. Abstract only, do not copy names.\n\n"
-        f"Text:\n{content}"
+        "请分析以下参考小说文本，提取抽象创作规律。用 [tag] 标题形式回复：\n"
+        "1. [worldbuilding] 世界观构建方式和设定规则（抽象描述，不含原书具体地名/设定）\n"
+        "2. [characters] 人物原型和关系模式（抽象人物类型，不含原书角色名）\n"
+        "3. [conflict] 冲突类型和解决模式（抽象冲突规律，不含具体剧情）\n"
+        "4. [style] 写作风格和叙事技法（抽象风格特征，不含原文引用）\n"
+        "5. [plot] 情节推进模型（抽象推进模式，不含具体事件链条）\n"
+        "6. [direction] 原创创作方向建议（基于规律的建议，不含续写/改写提示）\n\n"
+        "严禁复制原文、搬运角色名、搬运完整剧情桥段或简单换皮。\n\n"
+        f"参考文本：\n{content}"
     )
 
 
