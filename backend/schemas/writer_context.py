@@ -21,20 +21,6 @@ class WriterContextWarning(BaseModel):
     message: str = ""
 
 
-class WriterContext(BaseModel):
-    """完整的写作上下文，组合已有项目信息。"""
-    project_id: str
-    project: NovelProjectDetail | None = None
-    story_bible: StoryBible | None = None
-    chapters: list[ChapterSummary] = Field(default_factory=list)
-    outline: OutlineConfig | None = None
-    style_profile: StyleProfileConfig | None = None
-    automation: AutomationConfig | None = None
-    summaries: SummariesList = Field(default_factory=lambda: SummariesList(project_id=""))
-    reference_profile: ReferenceProfileSummary | None = None
-    warnings: list[WriterContextWarning] = Field(default_factory=list)
-
-
 class NextChapterPreview(BaseModel):
     """下一章预览（只预览，不创建文件）。"""
     project_id: str
@@ -71,6 +57,20 @@ class ReferenceProfileSummary(BaseModel):
         "不能复用原书剧情事件和桥段",
         "必须服务于用户自己的原创小说",
     ])
+
+
+class WriterContext(BaseModel):
+    """完整的写作上下文，组合已有项目信息。"""
+    project_id: str
+    project: NovelProjectDetail | None = None
+    story_bible: StoryBible | None = None
+    chapters: list[ChapterSummary] = Field(default_factory=list)
+    outline: OutlineConfig | None = None
+    style_profile: StyleProfileConfig | None = None
+    automation: AutomationConfig | None = None
+    summaries: SummariesList = Field(default_factory=lambda: SummariesList(project_id=""))
+    reference_profile: ReferenceProfileSummary | None = None
+    warnings: list[WriterContextWarning] = Field(default_factory=list)
 
 
 class PromptPreview(BaseModel):
