@@ -32,6 +32,7 @@ from .story_bible_service import load_story_bible
 PROJECT_ID_PATTERN = re.compile(r"^[A-Za-z0-9_-]+$")
 CHAPTER_EXTENSIONS = {".md", ".txt"}
 FILENAME_DIGITS_PATTERN = re.compile(r"(\d+)")
+CHAPTER_STYLE_PATTERN = re.compile(r"^(?P<prefix>.*?)(?P<number>\d+)$")
 
 
 def build_writer_context(project_id: str) -> WriterContext:
@@ -97,26 +98,17 @@ def preview_next_chapter(project_id: str) -> NextChapterPreview:
     """预览下一章信息（只预览，不创建文件）。
 
     根据已有章节推断下一个 chapter_id 和 order。
+    这里仅做预览，不创建文件，也不会覆盖已有章节。
     """
     _validate_project_id(project_id)
 
     chapters = list_chapters(project_id)
-    next_order = len(chapters) + 1
+    reference_chapter = _pick_reference_chapter(chapters)
+    next_order = _determine_next_order(chapters)
 
-    # 推断下一个 chapter_id
-    if not chapters:
-        suggested_chapter_id = "chapter-001"
-        suggested_filename = "chapter-001.md"
-    else:
-        last_chapter = chapters[-1]
-        last_num = _extract_numeric_part(last_chapter.chapter_id)
-        if last_num > 0:
-            next_num = last_num + 1
-            width = len(str(last_num))
-            suggested_chapter_id = f"ch{next_num:0{width}d}"
-        else:
-            suggested_chapter_id = f"chapter-{next_order:03d}"
-        suggested_filename = f"{suggested_chapter_id}.md"
+    # 尽量沿用现有命名风格；无法识别时回退到安全默认格式。
+    suggested_chapter_id = _build_suggested_chapter_id(reference_chapter, next_order)
+    suggested_filename = f"{suggested_chapter_id}.md"
 
     # 检查是否会覆盖已有章节
     project_dir = Path(__file__).resolve().parent.parent.parent / "novels" / project_id
@@ -149,13 +141,17 @@ def preview_next_chapter(project_id: str) -> NextChapterPreview:
 
 
 def preview_prompt(project_id: str) -> PromptPreview:
-    """返回 mock prompt 预览，不调用真实 AI。"""
+    """返回 mock prompt 预览。
+
+    这里只用于本地拼装 prompt 供检查和调试，不执行 AI 生成。
+    任何真正的 AI 生成都必须通过 `backend/ai/gateway.py`。
+    """
     _validate_project_id(project_id)
 
     ctx = build_writer_context(project_id)
     preview = preview_next_chapter(project_id)
 
-    # 构建 mock system prompt
+    # 这里只是本地预览，不会进入真实 AI 调用链。
     system_parts = ["你是一个专业的长篇小说写作助手。"]
     if ctx.style_profile:
         sp = ctx.style_profile
@@ -218,6 +214,43 @@ def _extract_numeric_part(s: str) -> int:
     if match:
         return int(match.group(1))
     return 0
+
+
+def _determine_next_order(chapters: list[ChapterSummary]) -> int:
+    """基于现有章节最大 order 或可识别编号推断下一章序号。"""
+    highest_order = 0
+    for chapter in chapters:
+        highest_order = max(highest_order, chapter.order)
+        highest_order = max(highest_order, _extract_numeric_part(chapter.chapter_id))
+    if highest_order <= 0:
+        return 1
+    return highest_order + 1
+
+
+def _pick_reference_chapter(chapters: list[ChapterSummary]) -> ChapterSummary | None:
+    """选出最适合作为命名风格参考的章节。"""
+    reference_chapter: ChapterSummary | None = None
+    highest_score = 0
+    for chapter in chapters:
+        score = max(chapter.order, _extract_numeric_part(chapter.chapter_id))
+        if score >= highest_score:
+            highest_score = score
+            reference_chapter = chapter
+    return reference_chapter
+
+
+def _build_suggested_chapter_id(
+    reference_chapter: ChapterSummary | None,
+    next_order: int,
+) -> str:
+    """尽量沿用现有命名风格；识别失败时回退安全默认格式。"""
+    if reference_chapter is not None:
+        match = CHAPTER_STYLE_PATTERN.fullmatch(reference_chapter.chapter_id)
+        if match:
+            prefix = match.group("prefix")
+            width = len(match.group("number"))
+            return f"{prefix}{next_order:0{width}d}"
+    return f"chapter-{next_order:03d}"
 
 
 def _safe_fetch(fn, warnings: list, warn_type: str, warn_msg: str):

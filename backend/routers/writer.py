@@ -67,8 +67,8 @@ async def get_prompt_preview(
 ) -> PromptPreview:
     """返回 mock prompt 预览。
 
-    uses_real_ai = false, provider = "mock"。不调用真实 AI。
-    不调用 backend/ai/gateway.py。
+    这里只用于本地检查 prompt 形态，不执行 AI 生成。
+    任何真正的 AI 生成都必须通过 `backend/ai/gateway.py`。
     """
     try:
         return preview_prompt(project_id)
