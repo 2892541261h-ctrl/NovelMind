@@ -19,7 +19,10 @@ export function DailyWriterPage() {
   const [error, setError] = useState<string | null>(null);
 
   const loadDrafts = useCallback(async () => {
-    if (!selectedId) return;
+    if (!selectedId) {
+      setDrafts([]);
+      return;
+    }
     try {
       const r = await fetch(`${BASE}/api/daily-writer/chapters?project_id=${selectedId}`);
       if (r.ok) setDrafts(await r.json());
@@ -27,7 +30,12 @@ export function DailyWriterPage() {
   }, [selectedId]);
 
   useEffect(() => {
-    if (!selectedId) return;
+    if (!selectedId) {
+      setDrafts([]);
+      setSelected(null);
+      setHasProfile(null);
+      return;
+    }
     loadDrafts();
     fetch(`${BASE}/api/reference-novels?project_id=${selectedId}`)
       .then((r) => r.json())
@@ -37,6 +45,16 @@ export function DailyWriterPage() {
       .then((p) => setHasProfile(!!p && !p.detail))
       .catch(() => setHasProfile(false));
   }, [selectedId, loadDrafts]);
+
+  function handleProjectIdChange(value: string) {
+    const nextId = Number(value) || 0;
+    setSelectedId(nextId);
+    if (nextId > 0) {
+      localStorage.setItem("selectedProjectId", String(nextId));
+    } else {
+      localStorage.removeItem("selectedProjectId");
+    }
+  }
 
   async function handleGenerate() {
     if (!selectedId) return;
@@ -70,7 +88,17 @@ export function DailyWriterPage() {
     <div className="space-y-4">
       <div className="flex items-center gap-4">
         <h2 className="text-lg font-semibold">Daily Writer</h2>
-        <span className="text-xs text-slate-500">project {selectedId || "(none)"}</span>
+        <label className="flex items-center gap-2 text-xs text-slate-500">
+          project_id
+          <input
+            type="number"
+            min={1}
+            value={selectedId || ""}
+            onChange={(e) => handleProjectIdChange(e.target.value)}
+            className="w-28 rounded border border-slate-700 bg-slate-800 px-2 py-1 text-sm text-white"
+            placeholder="project id"
+          />
+        </label>
       </div>
 
       {!selectedId ? (

@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 class ChapterDraftGenerateRequest(BaseModel):
     project_id: int
-    chapter_number: int = Field(default=0, ge=0)
+    chapter_number: int = Field(..., ge=1)
     title: str = Field(default="", max_length=200)
     writing_goal: str = Field(default="")
     extra_instruction: str = Field(default="")
