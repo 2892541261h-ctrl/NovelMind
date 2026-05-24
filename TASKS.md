@@ -335,7 +335,7 @@
 
 ### T064：设计参考小说分析 Prompt 草案
 
-状态：TODO
+状态：DONE
 
 负责人：Codex
 
@@ -345,6 +345,10 @@
 - Prompt 必须要求抽象设定逻辑、人物类型、剧情模式、文风特征和爽点节奏。
 - Prompt 必须禁止复制原文、搬运角色名、搬运完整剧情桥段或简单换皮。
 - 不调用真实 AI，不写业务代码。
+
+产物：
+
+- `prompts/reference_novel_analysis_prompt.md`
 
 验收：
 
