@@ -13,22 +13,49 @@ export function AISettingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [partialErrors, setPartialErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(true);
 
   async function load() {
-    try {
-      const [p, m, l, s] = await Promise.all([
-        fetch(`${BASE}/api/ai/providers`).then((r) => r.json()),
-        fetch(`${BASE}/api/ai/models`).then((r) => r.json()),
-        fetch(`${BASE}/api/ai/usage-logs`).then((r) => r.json()),
-        fetch(`${BASE}/api/ai/usage-logs/summary`).then((r) => r.json()),
-      ]);
-      setProviders(p);
-      setModels(m);
-      setLogs(l);
-      setSummary(s);
-    } catch {
-      setError("AI 设置数据加载失败，请确认后端已启动。");
+    setLoading(true);
+    setError(null);
+    setPartialErrors({});
+
+    const settle = await Promise.allSettled([
+      fetch(`${BASE}/api/ai/providers`).then((r) => r.json()),
+      fetch(`${BASE}/api/ai/models`).then((r) => r.json()),
+      fetch(`${BASE}/api/ai/usage-logs`).then((r) => r.json()),
+      fetch(`${BASE}/api/ai/usage-logs/summary`).then((r) => r.json()),
+    ]);
+
+    const [p, m, l, s] = settle;
+
+    if (p.status === "rejected") {
+      setError("后端可能未启动，请确认 NovelMind 正在运行。");
+      setLoading(false);
+      return;
     }
+    setProviders(Array.isArray(p.value) ? p.value : []);
+
+    if (m.status === "rejected") {
+      setPartialErrors((prev) => ({ ...prev, models: "模型列表暂时不可用" }));
+    } else {
+      setModels(Array.isArray(m.value) ? m.value : []);
+    }
+
+    if (l.status === "rejected") {
+      setPartialErrors((prev) => ({ ...prev, logs: "调用日志暂时不可用" }));
+    } else {
+      setLogs(Array.isArray(l.value) ? l.value : []);
+    }
+
+    if (s.status === "rejected") {
+      setPartialErrors((prev) => ({ ...prev, summary: "调用统计暂时不可用" }));
+    } else {
+      setSummary(s.value);
+    }
+
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -91,22 +118,22 @@ export function AISettingsPage() {
         这里只保存 API Key 的环境变量名，真实密钥由后端运行环境读取。请不要在页面中粘贴真实 API Key。
       </p>
 
-      <div className="flex flex-wrap gap-2">
-        {tabs.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => {
-              setTab(t.key);
-              setError(null);
-              setSuccess(null);
-            }}
-            className={`rounded px-3 py-1.5 text-xs font-medium ${tab === t.key ? "bg-cyan-600 text-white" : "border border-slate-700 text-slate-400 hover:text-white"}`}
-          >
-            {t.label}
-          </button>
-        ))}
-        <button onClick={() => { setShowForm(true); setEditing(null); }} className="rounded bg-cyan-600 px-3 py-1.5 text-xs text-white hover:bg-cyan-700">+ 新建</button>
-      </div>
+      {loading ? (
+        <p className="text-sm text-slate-500">正在加载 AI 设置数据...</p>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => { setTab(t.key); setError(null); setSuccess(null); }}
+              className={`rounded px-3 py-1.5 text-xs font-medium ${tab === t.key ? "bg-cyan-600 text-white" : "border border-slate-700 text-slate-400 hover:text-white"}`}
+            >
+              {t.label}
+            </button>
+          ))}
+          {!error && <button onClick={() => { setShowForm(true); setEditing(null); }} className="rounded bg-cyan-600 px-3 py-1.5 text-xs text-white hover:bg-cyan-700">+ 新建</button>}
+        </div>
+      )}
 
       {(showForm || editing) && (
         <form
@@ -155,6 +182,8 @@ export function AISettingsPage() {
         </form>
       )}
 
+      {partialErrors.providers && <div className="rounded border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-amber-400">{partialErrors.providers}</div>}
+
       {tab === "providers" && providers.map((p) => (
         <div key={p.id} className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900 p-3">
           <div>
@@ -168,6 +197,11 @@ export function AISettingsPage() {
           </div>
         </div>
       ))}
+      {tab === "providers" && !loading && !error && providers.length === 0 && (
+        <p className="rounded border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">暂无 AI 服务商，请先新增服务商配置。</p>
+      )}
+
+      {partialErrors.models && <div className="rounded border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-amber-400">{partialErrors.models}</div>}
 
       {tab === "models" && models.map((m) => (
         <div key={m.id} className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900 p-3">
@@ -184,14 +218,21 @@ export function AISettingsPage() {
           </div>
         </div>
       ))}
+      {tab === "models" && !loading && !error && !partialErrors.models && models.length === 0 && (
+        <p className="rounded border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">暂无模型，请先新增模型配置。</p>
+      )}
 
       {tab === "logs" && (
         <>
+          {partialErrors.summary && <div className="rounded border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-amber-400">{partialErrors.summary}</div>}
+          {partialErrors.logs && <div className="rounded border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-amber-400">{partialErrors.logs}</div>}
+
           {summary && (
-            <div className="grid grid-cols-3 gap-3 rounded-lg border border-slate-800 bg-slate-900 p-4 text-xs">
-              <div><span className="text-slate-500">调用次数</span><div className="text-lg">{summary.total_calls}</div></div>
-              <div><span className="text-slate-500">成功/失败</span><div className="text-lg">{summary.total_success}/{summary.total_error}</div></div>
-              <div><span className="text-slate-500">预估费用</span><div className="text-lg">${summary.total_estimated_cost?.toFixed(6) || "0"}</div></div>
+            <div className="grid grid-cols-4 gap-3 rounded-lg border border-slate-800 bg-slate-900 p-4 text-xs">
+              <div><span className="text-slate-500">调用次数</span><div className="text-lg">{summary.total_calls ?? 0}</div></div>
+              <div><span className="text-slate-500">成功/失败</span><div className="text-lg">{summary.total_success ?? 0} / {summary.total_error ?? 0}</div></div>
+              <div><span className="text-slate-500">总 Token</span><div className="text-lg">{summary.total_tokens ?? 0}</div></div>
+              <div><span className="text-slate-500">预估费用</span><div className="text-lg">${summary.total_estimated_cost != null ? Number(summary.total_estimated_cost).toFixed(6) : "0.00"}</div></div>
             </div>
           )}
           {logs.map((l) => (
@@ -204,7 +245,9 @@ export function AISettingsPage() {
               <span className="text-slate-600">{new Date(l.created_at).toLocaleString("zh-CN")}</span>
             </div>
           ))}
-          {logs.length === 0 && <p className="p-3 text-xs text-slate-600">暂无用量日志</p>}
+          {!loading && !error && !partialErrors.logs && logs.length === 0 && (
+            <p className="rounded border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">暂无调用日志，完成一次 AI 生成后会显示记录。</p>
+          )}
         </>
       )}
     </div>
