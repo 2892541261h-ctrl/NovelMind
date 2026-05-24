@@ -1,136 +1,157 @@
 # NovelMind
 
-NovelMind 是一个 AI 长篇小说创作平台。本仓库当前处于项目骨架阶段，只包含最小可运行后端、前端占位页面、小说示例目录和工程协作规则。
+AI 长篇小说创作平台。支持多 AI Provider、Story Bible 小说设定、Reference Creation Profile 参考创作档案、Daily Writer 自动章节生成。
 
-## 当前范围
+## 当前已完成功能
 
-- 后端：Python、FastAPI、Uvicorn、Pydantic，预留 SQLite。
-- 前端：React、Vite、TypeScript、Tailwind CSS。
-- AI：当前只允许 mock provider。
-- Daily Writer：仅保留目录和配置占位，不生成小说正文。
+- **后端 CRUD API**：项目管理、角色、章节、世界设定、大纲、伏笔、写作风格（FastAPI + SQLAlchemy + SQLite）
+- **AI Gateway**：统一 AI 调用入口，当前 mock provider，`backend/ai/gateway.py`
+- **Story Bible**：小说世界观/角色/地点/规则/剧情线读取 API
+- **Writer Context**：写作上下文预览（只读，不生成正文）
+- **前端 MVP**：React + Vite + TypeScript + Tailwind CSS 深色主题界面
+- **参考小说驱动原创写作**：完整规划设计文档（`docs/` 目录）
 
-## 后端启动
+## 技术栈
+
+| 层 | 技术 |
+|---|---|
+| 后端 | Python 3.11+, FastAPI, SQLAlchemy 2.0, SQLite, Pydantic |
+| 前端 | React 18, Vite 6, TypeScript 5.7, Tailwind CSS 3.4 |
+| AI | mock provider（不调用网络），统一入口 `backend/ai/gateway.py` |
+| 测试 | pytest, FastAPI TestClient, 内存 SQLite |
+| 平台 | Windows 本地开发 |
+
+## 环境要求
+
+- **Python 3.11+**（建议使用 `.venv` 虚拟环境）
+- **Node.js 20+**（含 npm）
+- **Git**
+
+### Windows Python 注意事项
+
+如果 `python` 命令打开 Microsoft Store 而不是运行 Python：
+
+1. 打开 Windows 设置 → 应用 → 应用执行别名
+2. 关闭 `python.exe` 和 `python3.exe` 的应用执行别名
+3. 确保 Python 已通过官网安装并加入 PATH
+
+## 首次启动
 
 ```powershell
+# 1. 克隆仓库
+git clone <repo-url>
+cd NovelMind
+
+# 2. 创建 Python 虚拟环境
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+
+# 3. 安装后端依赖
 cd backend
 pip install -r requirements.txt
-uvicorn main:app --reload
-```
+cd ..
 
-健康检查：
-
-```powershell
-Invoke-RestMethod http://127.0.0.1:8000/health
-```
-
-## 前端启动
-
-```powershell
+# 4. 安装前端依赖
 cd frontend
 npm install
-npm run dev
+cd ..
 ```
 
-默认地址：
+## 启动方式
+
+### 一键开发启动
 
 ```powershell
-http://127.0.0.1:5173
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-dev.ps1
+```
+
+此命令会打开两个 PowerShell 窗口，分别运行后端和前端。
+
+### 分别启动
+
+```powershell
+# 后端（http://127.0.0.1:8000）
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-backend.ps1
+
+# 前端（http://127.0.0.1:5173）
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-frontend.ps1
+```
+
+### 手动启动
+
+```powershell
+# 后端
+cd backend
+.\.venv\Scripts\python.exe -m uvicorn main:app --reload
+
+# 前端
+cd frontend
+npm run dev
 ```
 
 ## 本地检查
 
-在仓库根目录运行：
-
 ```powershell
+# 环境检查
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-env.ps1
+
+# 全量验证（含后端编译和前端构建）
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-all.ps1
 ```
 
-## AI 调用说明
+## 后端接口
 
-- AI 调用统一入口为 `backend/ai/gateway.py`，外部模块不得直接引用 `providers` 子包。
-- 当前只支持 mock provider（不调用网络、不读取 API Key）。
-- 可通过 `GET /health/ai-mock` 验证 gateway 是否正常工作。
+| 接口 | 说明 |
+|---|---|
+| `GET /health` | 健康检查 |
+| `GET /api/ai/test` | AI Gateway mock 测试 |
+| `GET /api/projects` | 项目列表 |
+| `POST /api/projects` | 创建项目 |
+| `GET /api/projects/{id}` | 项目详情 |
+| `GET /api/projects/{id}/characters` | 角色列表 |
+| `GET /api/projects/{id}/chapters` | 章节列表 |
+| `GET /projects/demo-project/story-bible` | Story Bible |
+| `GET /projects/demo-project/writer/context` | 写作上下文预览 |
 
-## 小说项目 API
+完整接口列表见各 `backend/routers/*.py`。
 
-小说项目存放在 `novels/{project_id}/` 目录下。提供以下接口：
+## 前端页面
 
-```powershell
-# 列出所有小说项目
-Invoke-RestMethod http://127.0.0.1:8000/projects
+| 路由 | 页面 | 状态 |
+|---|---|---|
+| `/` | Dashboard | 已完成 |
+| `/projects` | 项目管理 | 已完成 |
+| `/projects/:id` | 项目详情 | 已完成 |
+| `/characters` | 角色管理 | 已完成 |
+| `/chapters` | 章节管理 | 已完成 |
+| `/story-bible` | Story Bible | 占位 |
+| `/model-settings` | 模型设置 | 占位 |
+| `/daily-writer` | Daily Writer | 占位 |
 
-# 查看指定项目详情
-Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project
+## 不要提交的文件
 
-# 查看项目 Story Bible
-Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/story-bible
-```
+以下文件和目录已被 `.gitignore` 排除，不应提交到 Git：
 
-## 章节读取 API
-
-章节文件存放在 `novels/{project_id}/chapters/`，当前只支持只读读取。支持 `.md` 和 `.txt` 格式，忽略 `.gitkeep` 和隐藏文件。
-
-`project_id` 和 `chapter_id` 只允许使用字母、数字、短横线和下划线，避免路径穿越。
-
-```powershell
-# 列出指定项目的所有章节
-Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/chapters
-
-# 读取指定章节内容（chapter_id 对应文件名不含扩展名）
-Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/chapters/ch01
-```
-
-## 项目配置读取 API
-
-读取项目配置文件，均为只读：
-
-```powershell
-# 大纲
-Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/outline
-
-# 写作风格
-Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/style-profile
-
-# 自动化配置
-Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/automation
-
-# 摘要文件列表
-Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/summaries
-```
-
-## Writer Context API
-
-写作上下文预览（组合已有信息，只读，不生成正文）：
-
-```powershell
-# 完整写作上下文
-Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/writer/context
-
-# 下一章预览（不创建文件）
-Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/writer/next-chapter-preview
-
-# Mock prompt 预览（uses_real_ai=false）
-Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/writer/prompt-preview
-```
-
-## Story Bible
-
-Story Bible 是一个小说项目的完整设定文件，包含角色、地点、世界规则、剧情线和写作风格。以结构化 JSON 方式存储于 `novels/{project_id}/story-bible.json`。
-
-示例文件：`novels/demo-project/story-bible.json`
-
-`project_id` 只允许使用字母、数字、短横线和下划线，避免路径穿越。
-
-通过以下接口访问：
-
-```powershell
-Invoke-RestMethod http://127.0.0.1:8000/projects/demo-project/story-bible
-```
+- `.env` — 环境变量（含 API Key）
+- `.venv/` — Python 虚拟环境
+- `node_modules/` — 前端依赖
+- `frontend/dist/` — 前端构建产物
+- `*.db` — 本地 SQLite 数据库
+- `__pycache__/` — Python 缓存
+- `.pytest_cache/` — 测试缓存
 
 ## 安全规则
 
-- 不创建 `.env`。
-- 不提交真实 API Key。
-- 所有 AI 调用只能通过 `backend/ai/gateway.py`。
-- Daily Writer 不能覆盖已有章节。
-- `novels/demo-project/automation.json` 默认关闭自动生成。
+- 不创建 `.env`，不提交真实 API Key
+- 所有 AI 调用只能通过 `backend/ai/gateway.py`
+- Daily Writer 不能覆盖已有章节
+- 参考小说用于抽象分析，不能直接续写、复制、改写或换皮
+- `novels/demo-project/automation.json` 默认关闭自动生成
+
+## 项目文档
+
+- `TASKS.md` — 任务拆分与进度
+- `ROADMAP.md` — 路线图
+- `CHANGELOG.md` — 变更记录
+- `AGENTS.md` — AI 协作规范
+- `docs/` — 详细设计文档（参考小说分析、原创性规则等）

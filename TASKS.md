@@ -583,6 +583,87 @@
 
 - `frontend/src/pages/ChaptersPage.tsx`
 
+## 阶段 3C：开发体验与本地联调
+
+### T076：Windows 一键启动脚本
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- `scripts/start-backend.ps1`：自动进入 backend、使用 .venv、安装依赖、启动 FastAPI。
+- `scripts/start-frontend.ps1`：自动进入 frontend、安装依赖、启动 Vite。
+- `scripts/start-dev.ps1`：同时启动后端和前端（两个窗口）。
+
+产物：
+
+- `scripts/start-backend.ps1`
+- `scripts/start-frontend.ps1`
+- `scripts/start-dev.ps1`
+
+### T077：本地开发环境说明
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- `scripts/check-env.ps1`：检查 Git、Python、.venv、Node.js、npm 和项目依赖。
+- `README.md`：完整 Windows 本地运行说明，含环境要求、首次启动步骤、脚本说明。
+
+产物：
+
+- `scripts/check-env.ps1`
+- `README.md`（重写）
+
+### T078：前后端联调说明
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- `README.md` 中包含完整的后端接口表和前端页面状态表。
+- 一键启动脚本 `start-dev.ps1` 实现前后端同时启动。
+- `.env.example` 增加 `VITE_API_BASE_URL` 前端后端联调配置。
+
+产物：
+
+- `README.md`
+- `.env.example`
+
+### T079：检查脚本增强
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- `verify-all.ps1` 增强：优先使用 .venv Python、检查不应提交的构建产物（.venv/node_modules/dist/*.db）、后端编译检查、前端构建检查。
+
+产物：
+
+- `scripts/verify-all.ps1`（增强）
+
+### T080：GitHub README 运行说明完善
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- `README.md` 完整重写：项目简介、已完成功能、技术栈、环境要求、首次启动、脚本说明、接口表、前端页面表、安全规则、项目文档索引。
+
+产物：
+
+- `README.md`
+
 ## 阶段 4：Daily Writer
 
 ### T040：设计 Daily Writer 章节命名规则

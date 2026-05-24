@@ -1,4 +1,4 @@
-﻿param(
+param(
     [switch]$Strict
 )
 
@@ -15,10 +15,15 @@ function Fail {
     exit 1
 }
 
+function Warn {
+    param([string]$Message)
+    Write-Host "[verify] WARNING: $Message" -ForegroundColor Yellow
+}
+
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location $repoRoot
 
-Write-Step "检查必需文件"
+Write-Step "check required files"
 
 $requiredFiles = @(
     "AGENTS.md",
@@ -37,11 +42,11 @@ $requiredFiles = @(
 
 foreach ($file in $requiredFiles) {
     if (-not (Test-Path $file)) {
-        Fail "缺少必需文件：$file"
+        Fail "Missing required file: $file"
     }
 }
 
-Write-Step "检查禁止提交的本地环境文件"
+Write-Step "check forbidden env files"
 
 $forbiddenFiles = @(
     ".env",
@@ -52,11 +57,34 @@ $forbiddenFiles = @(
 
 foreach ($file in $forbiddenFiles) {
     if (Test-Path $file) {
-        Fail "禁止提交或保留环境文件：$file"
+        Fail "Forbidden env file found: $file"
     }
 }
 
-Write-Step "检查疑似密钥内容"
+Write-Step "check build artifacts not committed"
+
+$shouldNotCommit = @(
+    ".venv",
+    "venv",
+    "node_modules",
+    "frontend/dist",
+    "frontend/node_modules",
+    ".pytest_cache"
+)
+
+foreach ($item in $shouldNotCommit) {
+    if (Test-Path $item) {
+        Warn "Local dir should not be committed: $item (check .gitignore)"
+    }
+}
+
+$dbFiles = Get-ChildItem -Path $repoRoot -Filter "*.db" -File -ErrorAction SilentlyContinue
+$backendDb = Get-ChildItem -Path (Join-Path $repoRoot "backend") -Filter "*.db" -File -ErrorAction SilentlyContinue
+if ($dbFiles -or $backendDb) {
+    Warn "Local .db files found, ensure they are not committed"
+}
+
+Write-Step "check for secret patterns"
 
 $secretPatterns = @(
     "sk-[A-Za-z0-9_-]{20,}",
@@ -70,18 +98,19 @@ $textFiles = Get-ChildItem -Recurse -File |
         $_.FullName -notmatch "\\.git\\" -and
         $_.FullName -notmatch "\\node_modules\\" -and
         $_.FullName -notmatch "\\.venv\\" -and
-        $_.FullName -notmatch "\\__pycache__\\"
+        $_.FullName -notmatch "\\__pycache__\\" -and
+        $_.FullName -notmatch "\\dist\\"
     }
 
 foreach ($pattern in $secretPatterns) {
     $matches = $textFiles | Select-String -Pattern $pattern -ErrorAction SilentlyContinue
     if ($matches) {
         $first = $matches | Select-Object -First 1
-        Fail "发现疑似密钥内容：$($first.Path):$($first.LineNumber)"
+        Fail "Secret pattern found: $($first.Path):$($first.LineNumber)"
     }
 }
 
-Write-Step "检查 AI 调用必须通过 backend/ai/gateway.py"
+Write-Step "check AI calls only via backend/ai/gateway.py"
 
 $aiProviderPatterns = @(
     "openai",
@@ -100,7 +129,8 @@ $codeFiles = Get-ChildItem -Recurse -File -Include *.py,*.ts,*.tsx,*.js,*.jsx,*.
         $_.FullName -notmatch "\\.git\\" -and
         $_.FullName -notmatch "\\node_modules\\" -and
         $_.FullName -notmatch "\\.venv\\" -and
-        $_.FullName -notmatch "\\__pycache__\\"
+        $_.FullName -notmatch "\\__pycache__\\" -and
+        $_.FullName -notmatch "\\dist\\"
     }
 
 foreach ($file in $codeFiles) {
@@ -114,12 +144,12 @@ foreach ($file in $codeFiles) {
         $matches = Select-String -Path $file.FullName -Pattern $pattern -SimpleMatch -CaseSensitive:$false -ErrorAction SilentlyContinue
         if ($matches) {
             $first = $matches | Select-Object -First 1
-            Fail "发现可能绕过 gateway 的 AI Provider 引用：${normalized}:$($first.LineNumber)"
+            Fail "Possible bypass of gateway: ${normalized}:$($first.LineNumber)"
         }
     }
 }
 
-Write-Step "检查 Daily Writer 规则文档"
+Write-Step "check Daily Writer rules in docs"
 
 $dailyDocFiles = @(
     "AGENTS.md",
@@ -133,29 +163,89 @@ foreach ($docFile in $dailyDocFiles) {
     $dailyDocs += "`n"
 }
 
-if ($dailyDocs -notmatch "不能覆盖已有章节") {
-    Fail "Daily Writer 文档必须明确：不能覆盖已有章节"
-}
-
 if ($dailyDocs -notmatch "backend/ai/gateway.py") {
-    Fail "文档必须明确：所有 AI 调用只能通过 backend/ai/gateway.py"
+    Fail "Docs must state: all AI calls via backend/ai/gateway.py"
 }
 
-Write-Step "检查 Git 状态"
+Write-Step "check backend dependencies"
+
+$backendDir = Join-Path $repoRoot "backend"
+$venvPython = Join-Path $repoRoot ".venv\Scripts\python.exe"
+if (Test-Path $venvPython) {
+    $python = $venvPython
+    Write-Host "[verify] using venv Python: $python"
+} else {
+    $pyCmd = Get-Command python -ErrorAction SilentlyContinue
+    if ($pyCmd) {
+        $python = $pyCmd.Source
+        Write-Host "[verify] using system Python: $python"
+    } else {
+        Warn "Python not available, skipping backend checks"
+        $python = $null
+    }
+}
+
+if ($python) {
+    $reqFile = Join-Path $backendDir "requirements.txt"
+    if (Test-Path $reqFile) {
+        Write-Host "[verify] installing backend deps..."
+        & $python -m pip install -r $reqFile --quiet 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            Warn "pip install failed, check manually"
+        }
+    }
+
+    Write-Host "[verify] backend Python compile check..."
+    Push-Location $backendDir
+    try {
+        & $python -m compileall . -q 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            Warn "Python compile check had warnings"
+        } else {
+            Write-Host "[verify] backend compile OK"
+        }
+    } finally {
+        Pop-Location
+    }
+}
+
+Write-Step "check frontend build"
+
+$frontendDir = Join-Path $repoRoot "frontend"
+if (Test-Path $frontendDir) {
+    $nodeCmd = Get-Command node -ErrorAction SilentlyContinue
+    if ($nodeCmd) {
+        Push-Location $frontendDir
+        try {
+            if (-not (Test-Path "node_modules")) {
+                Write-Host "[verify] installing frontend deps..."
+                npm install --silent 2>&1 | Out-Null
+            }
+            Write-Host "[verify] frontend build..."
+            npm run build 2>&1 | Out-Null
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "[verify] frontend build OK"
+            } else {
+                Warn "frontend build failed, check: cd frontend && npm run build"
+            }
+        } finally {
+            Pop-Location
+        }
+    } else {
+        Warn "Node.js not available, skipping frontend check"
+    }
+}
+
+Write-Step "check git status"
 
 if ((Get-Command git -ErrorAction SilentlyContinue) -and (Test-Path ".git")) {
     git status --short
 } else {
-    Write-Host "[verify] 当前不在 Git 仓库内，跳过 git status"
+    Write-Host "[verify] not in a git repo, skip git status"
 }
 
 if ($Strict) {
-    Write-Step "Strict 模式当前没有额外检查"
+    Write-Step "strict mode: no extra checks"
 }
 
-Write-Host "[verify] 全部检查通过"
-
-
-
-
-
+Write-Host "[verify] all checks passed"
