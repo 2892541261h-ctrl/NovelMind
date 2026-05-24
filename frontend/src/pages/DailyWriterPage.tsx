@@ -35,7 +35,7 @@ export function DailyWriterPage() {
 
   const loadFormal = useCallback(async () => {
     if (!pid) { setFormalChs([]); return; }
-    try { const r = await fetch(`${BASE}/api/chapters?project_id=${pid}`); if (r.ok) setFormalChs(await r.json()); } catch { /* */ }
+    try { const r = await fetch(`${BASE}/api/formal-chapters?project_id=${pid}`); if (r.ok) setFormalChs(await r.json()); } catch { /* */ }
   }, [pid]);
 
   useEffect(() => {
@@ -83,7 +83,7 @@ export function DailyWriterPage() {
   async function publishDraft() {
     if (!selDraft) return; setPubLoading(true); setError(null);
     try {
-      const r = await fetch(`${BASE}/api/chapters/publish-draft/${selDraft.id}`, { method:"POST" });
+      const r = await fetch(`${BASE}/api/formal-chapters/publish-draft/${selDraft.id}`, { method:"POST" });
       const data = await r.json();
       if (!r.ok) throw new Error(data.detail || r.statusText);
       setTab("published"); setSelFormal(data.chapter); setSelDraft(null); loadFormal();
@@ -93,7 +93,7 @@ export function DailyWriterPage() {
 
   async function viewFormal(id: number) {
     setSelDraft(null);
-    try { const r = await fetch(`${BASE}/api/chapters/${id}`); if (r.ok) setSelFormal(await r.json()); } catch { /* */ }
+    try { const r = await fetch(`${BASE}/api/formal-chapters/${id}`); if (r.ok) setSelFormal(await r.json()); } catch { /* */ }
   }
 
   function exportMarkdown() { if (pid) window.open(`${BASE}/api/exports/project/${pid}/markdown`); }

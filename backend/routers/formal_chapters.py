@@ -10,7 +10,7 @@ from schemas.formal_chapter import (
 )
 from services import formal_chapter_service as fsvc
 
-router = APIRouter(prefix="/api/chapters", tags=["formal-chapters"])
+router = APIRouter(prefix="/api/formal-chapters", tags=["formal-chapters"])
 
 
 @router.get("", response_model=list[FormalChapterListItem])

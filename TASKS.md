@@ -873,7 +873,7 @@
 - 正式 Chapter 模型扩展（source_draft_id, word_count, published_at）
 - 正式 Chapter DB CRUD service（list/create/update/delete/publish_draft）
 - 草稿编辑 API（PATCH /api/daily-writer/chapters/{id}）
-- 草稿发布为正式章节（POST /api/chapters/publish-draft/{id}）
+- 草稿发布为正式章节（POST /api/formal-chapters/publish-draft/{id}）
 - 正式章节列表/详情 API
 - 导出 API（Markdown/TXT）
 - 前端 Tab 式 UI（Generate / Drafts / Published）
