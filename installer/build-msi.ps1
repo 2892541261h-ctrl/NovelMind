@@ -17,6 +17,16 @@ $finalCheck = Join-Path $repoRoot "scripts\final-release-check.ps1"
 function Find-CommandPath([string] $name) {
     $cmd = Get-Command $name -ErrorAction SilentlyContinue
     if ($cmd) { return $cmd.Source }
+
+    $candidatePaths = @(
+        (Join-Path $env:USERPROFILE ".dotnet\tools\$name"),
+        (Join-Path $env:ProgramFiles "WiX Toolset v4\bin\$name"),
+        (Join-Path ${env:ProgramFiles(x86)} "WiX Toolset v4\bin\$name")
+    )
+    foreach ($candidate in $candidatePaths) {
+        if ($candidate -and (Test-Path $candidate)) { return $candidate }
+    }
+
     return $null
 }
 

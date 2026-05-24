@@ -27,8 +27,40 @@
 
     <ComponentGroup Id="NovelMindFiles" Directory="INSTALLFOLDER">
       <Files
-        Include="$(var.RepoRoot)\**"
-        Exclude="$(var.RepoRoot)\.git\**;$(var.RepoRoot)\.venv\**;$(var.RepoRoot)\venv\**;$(var.RepoRoot)\node_modules\**;$(var.RepoRoot)\frontend\node_modules\**;$(var.RepoRoot)\frontend\dist\**;$(var.RepoRoot)\installer\dist\**;$(var.RepoRoot)\.pytest_cache\**;$(var.RepoRoot)\.env;$(var.RepoRoot)\.env.local;$(var.RepoRoot)\.env.development;$(var.RepoRoot)\.env.production;$(var.RepoRoot)\*.db;$(var.RepoRoot)\backend\*.db;$(var.RepoRoot)\*.msi;$(var.RepoRoot)\*.wixpdb;$(var.RepoRoot)\*.wixobj;$(var.RepoRoot)\*.zip;$(var.RepoRoot)\*.exe" />
+        Include="$(var.RepoRoot)\**">
+        <Exclude Files="$(var.RepoRoot)\.git\**" />
+        <Exclude Files="$(var.RepoRoot)\.venv\**" />
+        <Exclude Files="$(var.RepoRoot)\venv\**" />
+        <Exclude Files="$(var.RepoRoot)\node_modules\**" />
+        <Exclude Files="$(var.RepoRoot)\frontend\node_modules\**" />
+        <Exclude Files="$(var.RepoRoot)\frontend\dist\**" />
+        <Exclude Files="$(var.RepoRoot)\installer\dist\**" />
+        <Exclude Files="$(var.RepoRoot)\.pytest_cache\**" />
+        <Exclude Files="$(var.RepoRoot)\.env" />
+        <Exclude Files="$(var.RepoRoot)\.env.local" />
+        <Exclude Files="$(var.RepoRoot)\.env.development" />
+        <Exclude Files="$(var.RepoRoot)\.env.production" />
+        <Exclude Files="$(var.RepoRoot)\*.db" />
+        <Exclude Files="$(var.RepoRoot)\**\*.db" />
+        <Exclude Files="$(var.RepoRoot)\*.sqlite" />
+        <Exclude Files="$(var.RepoRoot)\**\*.sqlite" />
+        <Exclude Files="$(var.RepoRoot)\*.sqlite3" />
+        <Exclude Files="$(var.RepoRoot)\**\*.sqlite3" />
+        <Exclude Files="$(var.RepoRoot)\*.msi" />
+        <Exclude Files="$(var.RepoRoot)\**\*.msi" />
+        <Exclude Files="$(var.RepoRoot)\*.wixpdb" />
+        <Exclude Files="$(var.RepoRoot)\**\*.wixpdb" />
+        <Exclude Files="$(var.RepoRoot)\*.wixobj" />
+        <Exclude Files="$(var.RepoRoot)\**\*.wixobj" />
+        <Exclude Files="$(var.RepoRoot)\*.zip" />
+        <Exclude Files="$(var.RepoRoot)\**\*.zip" />
+        <Exclude Files="$(var.RepoRoot)\*.exe" />
+        <Exclude Files="$(var.RepoRoot)\**\*.exe" />
+        <Exclude Files="$(var.RepoRoot)\*.log" />
+        <Exclude Files="$(var.RepoRoot)\**\*.log" />
+        <Exclude Files="$(var.RepoRoot)\*.tmp" />
+        <Exclude Files="$(var.RepoRoot)\**\*.tmp" />
+      </Files>
     </ComponentGroup>
 
     <Component Id="DesktopShortcutComponent" Directory="DesktopFolder">
