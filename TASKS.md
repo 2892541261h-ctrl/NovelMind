@@ -899,6 +899,44 @@
 - `frontend/src/pages/DailyWriterPage.tsx`
 - `TASKS.md`
 
+## 阶段 3H：MVP Stabilization & Release Prep
+
+### T181-T220：MVP 稳定性验收 + Release Prep
+
+状态：DONE
+
+负责工具：Codex
+
+范围：
+
+- 从 `main` 创建本轮 T181-T220 stabilization 分支。
+- 检查 MVP 路由表和 API 前缀，确认正式章节使用 `/api/formal-chapters`。
+- 新增 `scripts/check-mvp-routes.ps1`，检查路由一致性、前端 API 路径、AI Gateway 调用链路和原创性约束。
+- 将 MVP 路由一致性检查接入 `scripts/verify-all.ps1`。
+- 新增 MVP 手动验收文档、演示流程文档和 Release Checklist。
+- 更新 README 的 MVP RC 链路、检查命令和验收文档入口。
+- 检查文档中正式章节 API 路径，保留旧章节模块的 `/api/chapters/{id}`，正式章节统一记录为 `/api/formal-chapters/{id}`。
+- 确认没有新增用户系统、支付系统、云部署、多模型调度、Agent 调度平台、GitHub Actions 自动 PR、富文本编辑器或权限系统。
+
+验收：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-env.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-mvp-routes.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-all.ps1
+git status --short
+```
+
+产物：
+
+- `scripts/check-mvp-routes.ps1`
+- `docs/MVP_SMOKE_TEST.md`
+- `docs/MVP_DEMO_FLOW.md`
+- `docs/RELEASE_CHECKLIST.md`
+- `README.md`
+- `TASKS.md`
+- `scripts/verify-all.ps1`
+
 ## 阶段 4：Daily Writer
 
 ### T040：设计 Daily Writer 章节命名规则
