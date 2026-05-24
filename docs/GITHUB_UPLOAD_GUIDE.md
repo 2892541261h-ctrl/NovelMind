@@ -16,6 +16,8 @@ git status --short
 
 ## 2. 运行最终封版检查
 
+上传前建议先确认 `docs/MVP_ACCEPTANCE_REPORT.md` 已生成，并且报告中的检查结果均为通过。
+
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\final-release-check.ps1
 ```

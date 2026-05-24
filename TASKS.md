@@ -978,6 +978,41 @@ git status --short
 - `README.md`
 - `TASKS.md`
 
+## 阶段 5B：MVP Acceptance & Upload Readiness
+
+### T261-T280：MVP 1.0 Acceptance Report + GitHub Upload Readiness
+
+状态：DONE
+
+负责工具：Codex
+
+范围：
+
+- 从 `main` 创建本轮 T261-T280 acceptance/upload-readiness 分支。
+- 运行 `check-env.ps1`、`check-mvp-routes.ps1`、`verify-all.ps1`、`final-release-check.ps1`。
+- 检查 `git status --short`、当前分支和最近提交。
+- 基于本地 `origin/main` 引用检查 `main` 相对远程的领先情况；未 fetch，未连接 GitHub。
+- 新增实际验收报告 `docs/MVP_ACCEPTANCE_REPORT.md`。
+- 更新 `docs/GITHUB_UPLOAD_GUIDE.md`，提示上传前确认验收报告已生成并通过。
+- 确认没有 push、没有创建 tag、没有创建 GitHub Release。
+- 确认没有提交 `.env`、`.venv`、`node_modules`、`frontend/dist`、`*.db`、API Key、Token、私钥、导出小说文件或大型日志。
+
+验收：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-env.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-mvp-routes.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-all.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\final-release-check.ps1
+git status --short
+```
+
+产物：
+
+- `docs/MVP_ACCEPTANCE_REPORT.md`
+- `docs/GITHUB_UPLOAD_GUIDE.md`
+- `TASKS.md`
+
 ## 阶段 4：Daily Writer
 
 ### T040：设计 Daily Writer 章节命名规则
