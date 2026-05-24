@@ -1036,6 +1036,31 @@
 - `scripts/check-mvp-routes.ps1`
 - `TASKS.md`
 
+## 阶段 3J：V1 Final Complete Local Release
+
+### T391-T425：V1 Final Dashboard + Polish + Acceptance
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- Project Dashboard API（聚合所有 V1 项目状态）
+- DashboardPage 重写（13 个指标 + 5 个 V1 工作流入口）
+- check-mvp-routes.ps1 增强（dashboard 检查）
+- V1_FINAL_ACCEPTANCE_REPORT.md
+- TASKS.md 定版
+
+产物：
+
+- `backend/services/dashboard_service.py`
+- `backend/routers/dashboard_routes.py`
+- `frontend/src/pages/DashboardPage.tsx`（重写）
+- `docs/V1_FINAL_ACCEPTANCE_REPORT.md`
+- `scripts/check-mvp-routes.ps1`
+- `TASKS.md`
+
 ## 阶段 3H：MVP Stabilization & Release Prep
 
 ### T181-T220：MVP 稳定性验收 + Release Prep

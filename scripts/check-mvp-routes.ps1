@@ -256,4 +256,9 @@ Require-Text "frontend/src/pages/AISettingsPage.tsx" "/api/ai/providers" "AI pro
 Require-Text "frontend/src/pages/AISettingsPage.tsx" "/api/ai/models" "AI model API in settings page"
 Require-Text "frontend/src/pages/AISettingsPage.tsx" "/api/ai/usage-logs" "Usage log API in settings page"
 
+Require-Text "frontend/src/pages/DashboardPage.tsx" "/api/project-dashboard/summary" "Dashboard summary API"
+Require-Text "backend/services/dashboard_service.py" "get_dashboard_summary" "Dashboard service"
+Require-Text "backend/services/dashboard_service.py" "has_story_bible" "Story Bible in dashboard"
+Require-Text "backend/services/dashboard_service.py" "estimated_total_cost" "Cost in dashboard"
+
 Write-Step "all MVP route checks passed"
