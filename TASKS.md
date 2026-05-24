@@ -274,7 +274,7 @@
 
 ### T061：设计 Reference Creation Profile 字段草案
 
-状态：TODO
+状态：DONE
 
 负责人：Codex
 
@@ -284,6 +284,10 @@
 - 字段至少包含 `reference_title`、`genre`、`worldbuilding_pattern`、`setting_rules`、`power_system_or_core_mechanism`、`character_archetypes`、`relationship_patterns`、`conflict_patterns`、`plot_progression_model`、`chapter_structure_pattern`、`writing_style_profile`、`pacing_profile`、`emotional_tone`、`reader_hook_patterns`、`taboo_or_avoid_rules`、`originality_rules`、`target_novel_direction`。
 - 明确 Reference Creation Profile 是参考方向，Story Bible 是用户原创小说设定。
 - 不创建数据库模型，不引入依赖。
+
+产物：
+
+- `docs/REFERENCE_CREATION_PROFILE_SPEC.md`
 
 验收：
 
