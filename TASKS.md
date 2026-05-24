@@ -899,6 +899,46 @@
 - `frontend/src/pages/DailyWriterPage.tsx`
 - `TASKS.md`
 
+## 阶段 3H：v1.2 Story Bible + 连续写作基础
+
+### T301-T325：v1.2 Story Bible + Character Cards + World Entries + Chapter Plans + Continuous Writing
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- NovelStoryBible、CharacterCard、WorldEntry、ChapterPlan ORM 模型
+- 4 组完整 CRUD schema（Create/Update/ListItem/Read）
+- 4 组 CRUD service（含 ChapterPlan 防重复）
+- 4 组 REST API router（各 5 个端点）
+- StoryBiblePage 前端：Tab 式 UI（故事圣经 / 人物卡 / 世界观 / 章节计划）
+- Daily Writer prompt 扩展：读取 Story Bible、人物卡、世界观条目、章节计划
+- DailyWriterPage 前端：v1.2 上下文计数栏 + 下一章编号建议
+- main.py 挂载 4 个 router
+- check-mvp-routes.ps1 新增 v1.2 路由检查
+
+新 API（20 个端点）：
+
+- `/api/story-bible` (5: GET/POST/GET:id/PATCH:id/DELETE:id)
+- `/api/character-cards` (5)
+- `/api/world-entries` (5)
+- `/api/chapter-plans` (5)
+
+产物：
+
+- `backend/models/novel_story_bible.py`、`character_card.py`、`world_entry.py`、`chapter_plan.py`
+- `backend/schemas/story_bible_schema.py`、`character_card_schema.py`、`world_entry_schema.py`、`chapter_plan_schema.py`
+- `backend/services/sb_service.py`、`cc_service.py`、`we_service.py`、`cp_service.py`
+- `backend/routers/story_bible_routes.py`、`character_cards_routes.py`、`world_entries_routes.py`、`chapter_plans_routes.py`
+- `backend/services/daily_writer_service.py`（扩展）
+- `frontend/src/pages/StoryBiblePage.tsx`（重写）
+- `frontend/src/pages/DailyWriterPage.tsx`（扩展）
+- `backend/main.py`
+- `scripts/check-mvp-routes.ps1`
+- `TASKS.md`
+
 ## 阶段 3H：MVP Stabilization & Release Prep
 
 ### T181-T220：MVP 稳定性验收 + Release Prep

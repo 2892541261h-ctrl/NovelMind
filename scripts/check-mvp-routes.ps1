@@ -181,4 +181,15 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Host "[mvp-routes] $output"
 
+Write-Step "check v1.2 routes"
+
+Require-Text "frontend/src/pages/DailyWriterPage.tsx" "/api/story-bible?project_id=" "Story Bible API in DailyWriter"
+Require-Text "frontend/src/pages/DailyWriterPage.tsx" "/api/character-cards?project_id=" "Character Cards API in DailyWriter"
+Require-Text "frontend/src/pages/DailyWriterPage.tsx" "/api/world-entries?project_id=" "World Entries API in DailyWriter"
+Require-Text "frontend/src/pages/DailyWriterPage.tsx" "/api/chapter-plans?project_id=" "Chapter Plans API in DailyWriter"
+Require-Text "backend/services/daily_writer_service.py" "list_bibles" "Story Bible in prompt builder"
+Require-Text "backend/services/daily_writer_service.py" "list_cards" "Character Cards in prompt builder"
+Require-Text "backend/services/daily_writer_service.py" "list_entries" "World Entries in prompt builder"
+Require-Text "backend/services/daily_writer_service.py" "get_plan_by_number" "Chapter Plan in prompt builder"
+
 Write-Step "all MVP route checks passed"
