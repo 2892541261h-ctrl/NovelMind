@@ -5,6 +5,9 @@ from fastapi import FastAPI
 from config import settings
 from database import Base, engine
 from routers.ai import router as ai_router
+from routers.ai_models_routes import router as ai_models_router
+from routers.ai_providers_routes import router as ai_providers_router
+from routers.ai_usage_logs_routes import router as ai_usage_logs_router
 from routers.chapter import router as chapter_router
 from routers.character_cards_routes import router as cc_routes_router
 from routers.characters import router as characters_router
@@ -63,6 +66,9 @@ app.include_router(reference_novels_router)
 app.include_router(daily_writer_router)
 app.include_router(formal_chapters_router)
 app.include_router(exports_router)
+app.include_router(ai_providers_router)
+app.include_router(ai_models_router)
+app.include_router(ai_usage_logs_router)
 app.include_router(sb_routes_router)
 app.include_router(cc_routes_router)
 app.include_router(we_routes_router)
