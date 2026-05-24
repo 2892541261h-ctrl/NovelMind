@@ -51,6 +51,15 @@ def list_profiles(db: Session, project_id: int) -> list[ReferenceProfile]:
     return db.query(ReferenceProfile).filter(ReferenceProfile.project_id == project_id).all()
 
 
+def get_latest_profile_for_project(db: Session, project_id: int) -> ReferenceProfile | None:
+    return (
+        db.query(ReferenceProfile)
+        .filter(ReferenceProfile.project_id == project_id)
+        .order_by(ReferenceProfile.created_at.desc())
+        .first()
+    )
+
+
 def get_profile(db: Session, profile_id: int) -> ReferenceProfile | None:
     return db.query(ReferenceProfile).filter(ReferenceProfile.id == profile_id).first()
 

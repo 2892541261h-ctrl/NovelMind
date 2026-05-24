@@ -15,6 +15,7 @@ from schemas.story_bible import StoryBible
 from schemas.writer_context import (
     NextChapterPreview,
     PromptPreview,
+    ReferenceProfileSummary,
     WriterContext,
     WriterContextWarning,
 )
@@ -81,6 +82,8 @@ def build_writer_context(project_id: str) -> WriterContext:
     # 摘要列表
     summaries = _safe_fetch_summaries(project_id, warnings)
 
+    reference_profile = _safe_fetch_reference_profile(project_id, warnings)
+
     return WriterContext(
         project_id=project_id,
         project=project,
@@ -90,6 +93,7 @@ def build_writer_context(project_id: str) -> WriterContext:
         style_profile=style_profile,
         automation=automation,
         summaries=summaries,
+        reference_profile=reference_profile,
         warnings=warnings,
     )
 
@@ -259,6 +263,45 @@ def _safe_fetch(fn, warnings: list, warn_type: str, warn_msg: str):
         return fn()
     except Exception:
         warnings.append(WriterContextWarning(type=warn_type, message=warn_msg))
+        return None
+
+
+def _safe_fetch_reference_profile(
+    project_id: str, warnings: list
+) -> ReferenceProfileSummary | None:
+    try:
+        pid = int(project_id)
+    except ValueError:
+        return None
+
+    try:
+        from database import SessionLocal
+        from services.reference_novel_service import get_latest_profile_for_project
+
+        db = SessionLocal()
+        try:
+            profile = get_latest_profile_for_project(db, pid)
+            if profile is None:
+                return None
+            return ReferenceProfileSummary(
+                id=profile.id,
+                novel_id=profile.novel_id,
+                project_id=profile.project_id,
+                genre=profile.genre,
+                worldbuilding_pattern=profile.worldbuilding_pattern,
+                character_archetypes=profile.character_archetypes,
+                conflict_patterns=profile.conflict_patterns,
+                writing_style_profile=profile.writing_style_profile,
+                plot_progression_model=profile.plot_progression_model,
+                target_novel_direction=profile.target_novel_direction,
+            )
+        finally:
+            db.close()
+    except Exception:
+        warnings.append(WriterContextWarning(
+            type="reference_profile_unavailable",
+            message=f"无法读取项目 {project_id} 的参考创作画像",
+        ))
         return None
 
 

@@ -752,6 +752,82 @@
 
 - `backend/main.py`、`frontend/src/App.tsx`、`frontend/src/components/Sidebar.tsx`
 
+## 阶段 3E：Reference Profile 接入写作上下文
+
+### T086：代码结构审查
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- 检查 writer_context_service、writer router、writer_context schema、reference_novel_service 等已有代码。
+- 确认接入点：WriterContext schema + build_writer_context() + DailyWriterPage。
+
+### T087：项目级 Reference Profile 读取
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- `reference_novel_service` 新增 `get_latest_profile_for_project(project_id)`。
+- 优先返回最新生成的 ReferenceProfile。
+
+产物：
+
+- `backend/services/reference_novel_service.py`
+
+### T088：注入 Writer Context
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- WriterContext schema 新增 `ReferenceProfileSummary`（含 genre、worldbuilding_pattern、character_archetypes、conflict_patterns、writing_style_profile、plot_progression_model、target_novel_direction）
+- 包含 5 条原创性约束
+- `build_writer_context()` 新增 DB 查询，注入 reference_profile
+- 仅当 project_id 为整数时查询 DB
+
+产物：
+
+- `backend/schemas/writer_context.py`
+- `backend/services/writer_context_service.py`
+
+### T089：前端 Reference Profile 指示器
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- DailyWriterPage 检查当前项目是否有 Reference Profile。
+- 有则显示"已接入参考创作画像"（绿色），无则提示去 Ref Novels 页面分析。
+
+产物：
+
+- `frontend/src/pages/DailyWriterPage.tsx`
+
+### T090：文档与验证
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- TASKS.md 记录 T086-T090。
+- verify-all.ps1 通过。
+
+产物：
+
+- `TASKS.md`
+
 ## 阶段 4：Daily Writer
 
 ### T040：设计 Daily Writer 章节命名规则
