@@ -1,5 +1,16 @@
 # NovelMind MVP 1.0 Release Notes
 
+## V1 Final + UI Polish 更新记录
+
+V1 Final 是当前本地完整封版状态。本轮重点是 UI 中文化、浅色/深色模式和演示体验打磨，不新增大型业务功能，也不改变 AI Gateway 调用规则。
+
+- 全站主要用户界面完成中文化，包括 Dashboard、Daily Writer、Story Bible、Reference Novel、AI Settings、Sidebar 和 Layout。
+- 新增浅色/深色主题，主题选择持久化到 `localStorage("novelmind-theme")`。
+- Dashboard、DailyWriterPage、Sidebar、Layout 和全局样式按中文写作工作台体验重写。
+- 统一 card、button、badge、tab、toast、empty-state、sidebar-link 和 stat-card 等基础样式。
+- 后端业务逻辑、AI Gateway 和 API 路径保持稳定。
+- 下一阶段可进入 Windows MSI 本地安装包打包准备。
+
 NovelMind MVP 1.0 是本地可运行的长篇小说创作 MVP 封版状态。它聚焦一条完整的原创写作闭环：
 
 Reference Novel -> Reference Profile -> Writer Context -> Daily Writer -> Chapter Draft -> Edit Draft -> Publish Formal Chapter -> View Formal Chapter -> Export Markdown / TXT

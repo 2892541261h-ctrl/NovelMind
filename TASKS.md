@@ -39,6 +39,31 @@
 .\scripts\verify-all.ps1
 ```
 
+## 阶段 V1 Final：中文 UI 与本地封版体验打磨
+
+### T281-T320：V1 Final Complete Local Release + UI Polish
+
+状态：DONE
+
+负责人：Claude Code + Codex
+
+范围：
+
+- 全站主要界面中文化：Dashboard、Daily Writer、Story Bible、Reference Novel、AI Settings、Sidebar、Layout。
+- 新增浅色/深色主题，主题选择持久化到 `localStorage("novelmind-theme")`。
+- Dashboard、DailyWriterPage、Sidebar、Layout 和 `styles.css` 按中文写作工作台体验重写。
+- 保持 AI Gateway 统一调用规则，不修改后端业务链路，不引入新依赖。
+- 补充 V1 Final 文档记录，后续可进入 Windows MSI 打包阶段。
+
+验收：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-env.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-mvp-routes.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-all.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\final-release-check.ps1
+```
+
 ### T002：创建最小目录骨架
 
 状态：TODO
@@ -996,6 +1021,68 @@
 - `backend/services/cr_service.py`
 - `backend/routers/chapter_reviews_routes.py`、`continuity_routes.py`
 - `frontend/src/pages/DailyWriterPage.tsx`（扩展 review UI）
+- `scripts/check-mvp-routes.ps1`
+- `TASKS.md`
+
+## 阶段 3I：v1.3 AI Provider + Model Config + Usage Logs
+
+### T361-T383：v1.3 Real AI Provider + Model Config + Usage Logs
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- AIProviderConfig 模型/CRUD（api_key_env_var 只存变量名，不存真实 Key）
+- AIModelConfig 模型/CRUD（provider_id, model, prices, context_window, is_default, is_active）
+- AIUsageLog 模型/CRUD（feature_name, provider/model, tokens, estimated_cost, latency_ms）
+- Gateway v1.3：支持 oai_compat provider 调用 + 配置化选择 + 自动日志
+- 成本估算：基于用户配置价格 × token 用量
+- AISettingsPage：Provider + Model + Usage Log 管理
+- .env.example 新增 OPENAI_API_KEY 等占位变量
+- 所有 AI 调用仍经过 backend/ai/gateway.py
+
+新 API（14 个端点）：
+
+- `/api/ai/providers` (5)
+- `/api/ai/models` (6, incl. set-default)
+- `/api/ai/usage-logs` (3, incl. summary)
+
+产物：
+
+- `backend/models/ai_provider_config.py`、`ai_model_config.py`、`ai_usage_log.py`
+- `backend/schemas/ai_provider_config_schema.py`、`ai_model_config_schema.py`、`ai_usage_log_schema.py`
+- `backend/services/apc_service.py`、`amc_service.py`、`aul_service.py`
+- `backend/routers/ai_providers_routes.py`、`ai_models_routes.py`、`ai_usage_logs_routes.py`
+- `backend/ai/gateway.py`（增强）
+- `frontend/src/pages/AISettingsPage.tsx`
+- `.env.example`
+- `scripts/check-mvp-routes.ps1`
+- `TASKS.md`
+
+## 阶段 3J：V1 Final Complete Local Release
+
+### T391-T425：V1 Final Dashboard + Polish + Acceptance
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- Project Dashboard API（聚合所有 V1 项目状态）
+- DashboardPage 重写（13 个指标 + 5 个 V1 工作流入口）
+- check-mvp-routes.ps1 增强（dashboard 检查）
+- V1_FINAL_ACCEPTANCE_REPORT.md
+- TASKS.md 定版
+
+产物：
+
+- `backend/services/dashboard_service.py`
+- `backend/routers/dashboard_routes.py`
+- `frontend/src/pages/DashboardPage.tsx`（重写）
+- `docs/V1_FINAL_ACCEPTANCE_REPORT.md`
 - `scripts/check-mvp-routes.ps1`
 - `TASKS.md`
 

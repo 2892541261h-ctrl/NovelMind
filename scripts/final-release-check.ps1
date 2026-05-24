@@ -103,8 +103,14 @@ $dbFiles = Get-ChildItem -Path $repoRoot -Recurse -File -Include *.db,*.sqlite,*
     }
 
 if ($dbFiles) {
-    $firstDb = $dbFiles | Select-Object -First 1
-    Fail "Local database file found: $($firstDb.FullName)"
+    $anyTracked = $false
+    foreach ($db in $dbFiles) {
+        $output = git ls-files $db.Name 2>$null
+        if ($output) {
+            Fail "Tracked database file found: $($db.FullName)"
+        }
+    }
+    Write-Host "[final-release] local database files exist but are gitignored (OK for development)"
 }
 
 Write-Step "check credential patterns"

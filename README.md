@@ -1,5 +1,11 @@
 # NovelMind
 
+## V1 Final + UI Polish
+
+NovelMind V1 Final 已进入本地完整封版状态，前端已按中文写作工作台体验完成主要界面中文化与视觉打磨。当前支持浅色/深色模式，主题选择会持久化到 `localStorage("novelmind-theme")`，刷新后保持用户选择。
+
+本轮不改变后端业务链路、不改变 AI Gateway 规则、不新增依赖。后续可在当前本地封版基础上进入 Windows MSI 打包阶段。
+
 AI 长篇小说创作平台。支持多 AI Provider、Story Bible 小说设定、Reference Creation Profile 参考创作档案、Daily Writer 自动章节生成。
 
 ## 当前已完成功能
