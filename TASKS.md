@@ -828,6 +828,38 @@
 
 - `TASKS.md`
 
+## 阶段 3F：Daily Writer MVP 写作闭环
+
+### T091-T120：Daily Writer MVP 写作闭环 + 章节草稿管理
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- ChapterDraft ORM 模型（id, project_id, chapter_number, title, content, status, source, writing_goal, prompt_snapshot, context_snapshot）
+- ChapterDraft Pydantic schema（Create/ListItem/Read/GenerateRequest/GenerateResponse）
+- ChapterDraft service（CRUD + generate_draft 通过 AI Gateway）
+- Daily Writer prompt builder（Reference Profile 接入 + 原创性约束）
+- Daily Writer API（POST /generate, GET/DELETE /chapters）
+- 章节防覆盖保护（project_id + chapter_number 已有则 409）
+- 前端 DailyWriterPage（生成表单 + 草稿列表 + 内容查看 + 删除确认 + Reference Profile 状态）
+- TASKS.md 更新
+
+后端产物：
+
+- `backend/models/chapter_draft.py`
+- `backend/schemas/chapter_draft.py`
+- `backend/services/chapter_draft_service.py`
+- `backend/services/daily_writer_service.py`
+- `backend/routers/daily_writer.py`
+- `backend/main.py`
+
+前端产物：
+
+- `frontend/src/pages/DailyWriterPage.tsx`
+
 ## 阶段 4：Daily Writer
 
 ### T040：设计 Daily Writer 章节命名规则
