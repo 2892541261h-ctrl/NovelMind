@@ -8,6 +8,8 @@ NovelMind 是一个 AI 长篇小说创作平台，后续将支持：
 
 - 多 AI Provider。
 - Story Bible 小说圣经。
+- Reference Creation Profile 参考创作档案。
+- Reference Novel Guided Original Writing 参考小说驱动原创写作。
 - Daily Writer 每日自动生成小说章节。
 - GitHub Actions 自动创建小说更新 Pull Request。
 - Windows 本地开发。
@@ -24,6 +26,9 @@ NovelMind 是一个 AI 长篇小说创作平台，后续将支持：
 - 代码审查。
 - 构建、测试、检查失败的修复。
 - Daily Writer 自动化流程编排。
+- Reference Creation Profile 数据结构草案。
+- 参考小说分析 Prompt 文件草案。
+- 原创性、人物不照搬、剧情不换皮等规则文档和校验脚本。
 
 ### Claude Code 负责
 
@@ -32,6 +37,11 @@ NovelMind 是一个 AI 长篇小说创作平台，后续将支持：
 - 数据模型。
 - API 接口。
 - Daily Writer 生成逻辑。
+- 参考小说文件导入。
+- 长文本分章和分块理解。
+- Reference Creation Profile 生成流程。
+- 从 Reference Creation Profile 生成用户原创 Story Bible 的逻辑。
+- Daily Writer 读取 Reference Creation Profile 的业务接入。
 - 大段代码实现。
 
 ## 禁止事项
@@ -40,6 +50,8 @@ NovelMind 是一个 AI 长篇小说创作平台，后续将支持：
 - 不创建 `.env` 文件。
 - 不把 AI Provider SDK 或 HTTP 调用散落在业务代码中。
 - 不覆盖已有小说章节。
+- 不直接续写、复制、改写或换皮参考小说。
+- 不直接搬运参考小说角色名、人物关系或完整剧情桥段。
 - 不在一个任务中同时实现多个大功能。
 - 不在规范任务中创建复杂前后端业务代码。
 - 不绕过 `scripts/verify-all.ps1` 的检查结果。
@@ -61,6 +73,34 @@ backend/ai/gateway.py
 - GitHub Actions 和 Daily Writer 自动化只能调用后端封装入口，不得绕过 gateway。
 - 审查代码时，发现任何绕过 `backend/ai/gateway.py` 的 AI 调用都必须退回修改。
 
+## 参考小说驱动原创写作规则
+
+Reference Novel Guided Original Writing（参考小说驱动原创写作）用于读取参考小说并抽象创作方向，不能被描述或实现为参考小说续写。
+
+该功能的正确工作流是：
+
+```text
+参考小说
+-> AI 阅读理解
+-> 生成 Reference Creation Profile
+-> 用户确认创作方向
+-> 生成用户原创小说的 Story Bible
+-> Daily Writer 根据 Story Bible 写用户自己的小说
+```
+
+Reference Creation Profile（参考创作档案）是从参考小说中提取的“参考方向”，包括设定逻辑、人物类型、剧情模式、冲突模式、文风节奏、爽点设计和章节推进方式。
+
+Story Bible 是用户自己的原创小说设定。任何章节生成都必须以用户原创 Story Bible 为主，Reference Creation Profile 只能作为已确认的方向参考。
+
+硬性规则：
+
+- 不能直接复制参考小说原文。
+- 不能直接搬运参考小说角色名。
+- 不能直接搬运参考小说完整剧情桥段。
+- 不能把参考小说简单换皮。
+- 参考小说原文不得作为 Daily Writer 的直接章节生成来源。
+- 相关 AI 分析、生成和检查都必须通过 `backend/ai/gateway.py`。
+
 ## Daily Writer 章节安全规则
 
 Daily Writer 必须遵守：
@@ -70,6 +110,10 @@ Daily Writer 必须遵守：
 - 新章节必须使用新的章节编号或新的唯一文件名。
 - 生成前必须检查目标章节路径是否已存在。
 - 如果目标文件已存在，流程必须失败并提示人工处理。
+- 不能直接续写参考小说。
+- 不能直接复制参考小说原文、角色名或完整剧情桥段。
+- 不能把参考小说简单换皮。
+- 应读取用户原创小说的 Story Bible、用户确认过的 Reference Creation Profile、已有章节内容和本章写作目标。
 - 自动创建 Pull Request 时，只能包含本次新增章节和必要元数据更新。
 - Daily Writer 生成逻辑由 Claude Code 实现，自动化流程由 Codex 编排。
 
