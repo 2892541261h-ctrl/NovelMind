@@ -34,6 +34,21 @@ def create_draft(db: Session, data: ChapterDraftCreate) -> ChapterDraft:
     return draft
 
 
+def update_draft(
+    db: Session, draft_id: int, title: str | None = None, content: str | None = None
+) -> ChapterDraft | None:
+    draft = db.query(ChapterDraft).filter(ChapterDraft.id == draft_id).first()
+    if not draft:
+        return None
+    if title is not None:
+        draft.title = title
+    if content is not None:
+        draft.content = content
+    db.commit()
+    db.refresh(draft)
+    return draft
+
+
 def delete_draft(db: Session, draft_id: int) -> bool:
     draft = db.query(ChapterDraft).filter(ChapterDraft.id == draft_id).first()
     if not draft:

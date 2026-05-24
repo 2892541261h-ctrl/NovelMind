@@ -860,6 +860,45 @@
 
 - `frontend/src/pages/DailyWriterPage.tsx`
 
+## 阶段 3G：MVP Release Candidate
+
+### T121-T180：NovelMind MVP Release Candidate
+
+状态：DONE
+
+负责人：Claude Code
+
+范围：
+
+- 正式 Chapter 模型扩展（source_draft_id, word_count, published_at）
+- 正式 Chapter DB CRUD service（list/create/update/delete/publish_draft）
+- 草稿编辑 API（PATCH /api/daily-writer/chapters/{id}）
+- 草稿发布为正式章节（POST /api/formal-chapters/publish-draft/{id}）
+- 正式章节列表/详情 API
+- 导出 API（Markdown/TXT）
+- 前端 Tab 式 UI（Generate / Drafts / Published）
+- 前端草稿编辑（title + content textarea + Save）
+- 前端发布按钮（Publish → 正式章节，草稿保留）
+- 前端正式章节列表 + 查看
+- 前端 Export MD / Export TXT 按钮
+- 章节防覆盖：草稿不覆盖草稿，发布不覆盖正式章节，编辑草稿不影响正式章节
+- Reference Profile 保持进入生成上下文
+- AI 调用全部通过 backend/ai/gateway.py
+
+产物：
+
+- `backend/models/chapter.py`（扩展）
+- `backend/schemas/formal_chapter.py`
+- `backend/services/formal_chapter_service.py`
+- `backend/services/export_service.py`
+- `backend/services/chapter_draft_service.py`（扩展 update_draft）
+- `backend/routers/formal_chapters.py`
+- `backend/routers/exports.py`
+- `backend/routers/daily_writer.py`（扩展 PATCH）
+- `backend/main.py`
+- `frontend/src/pages/DailyWriterPage.tsx`
+- `TASKS.md`
+
 ## 阶段 4：Daily Writer
 
 ### T040：设计 Daily Writer 章节命名规则
