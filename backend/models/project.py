@@ -1,0 +1,19 @@
+from datetime import datetime
+
+from sqlalchemy import String, Integer, DateTime, func
+from sqlalchemy.orm import Mapped, mapped_column
+
+from database import Base
+
+
+class Project(Base):
+    __tablename__ = "projects"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    title: Mapped[str] = mapped_column(String(200), nullable=False, default="")
+    genre: Mapped[str] = mapped_column(String(100), default="")
+    description: Mapped[str] = mapped_column(String(2000), default="")
+    target_word_count: Mapped[int] = mapped_column(Integer, default=0)
+    status: Mapped[str] = mapped_column(String(50), default="planning")
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
