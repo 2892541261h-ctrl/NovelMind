@@ -33,9 +33,6 @@ if (-not (Test-Path $wxsPath)) {
 New-Item -ItemType Directory -Force -Path $distDir | Out-Null
 
 $wix = Find-CommandPath "wix.exe"
-$candle = Find-CommandPath "candle.exe"
-$light = Find-CommandPath "light.exe"
-
 if ($wix) {
     Write-Host "[installer] using WiX CLI: $wix"
     & $wix build $wxsPath -d RepoRoot=$repoRoot -out $msiPath
@@ -44,19 +41,7 @@ if ($wix) {
     exit 0
 }
 
-if ($candle -and $light) {
-    Write-Host "[installer] using WiX v3 tools: $candle / $light"
-    $wixObj = Join-Path $distDir "NovelMind.wixobj"
-    $wixPdb = Join-Path $distDir "NovelMind.wixpdb"
-    & $candle -dRepoRoot="$repoRoot" -out $wixObj $wxsPath
-    if ($LASTEXITCODE -ne 0) { throw "WiX candle failed." }
-    & $light -out $msiPath -pdbout $wixPdb $wixObj
-    if ($LASTEXITCODE -ne 0) { throw "WiX light failed." }
-    Write-Host "[installer] MSI generated: $msiPath"
-    exit 0
-}
-
 Write-Host "[installer] WiX Toolset was not found." -ForegroundColor Yellow
-Write-Host "[installer] Install WiX Toolset v4 (wix.exe) or WiX v3 (candle.exe/light.exe), then rerun this script." -ForegroundColor Yellow
+Write-Host "[installer] Install WiX Toolset v4 (wix.exe), then rerun this script." -ForegroundColor Yellow
 Write-Host "[installer] No MSI was generated." -ForegroundColor Yellow
 exit 2
