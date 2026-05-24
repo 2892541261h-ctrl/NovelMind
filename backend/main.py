@@ -10,6 +10,7 @@ from routers.ai_providers_routes import router as ai_providers_router
 from routers.ai_usage_logs_routes import router as ai_usage_logs_router
 from routers.chapter import router as chapter_router
 from routers.character_cards_routes import router as cc_routes_router
+from routers.dashboard_routes import router as dashboard_router
 from routers.characters import router as characters_router
 from routers.chapter_plans_routes import router as cp_routes_router
 from routers.chapter_reviews_routes import router as cr_review_router
@@ -69,6 +70,7 @@ app.include_router(exports_router)
 app.include_router(ai_providers_router)
 app.include_router(ai_models_router)
 app.include_router(ai_usage_logs_router)
+app.include_router(dashboard_router)
 app.include_router(sb_routes_router)
 app.include_router(cc_routes_router)
 app.include_router(we_routes_router)
