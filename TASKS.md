@@ -297,7 +297,7 @@
 
 ### T062：设计参考小说导入流程
 
-状态：TODO
+状态：DONE
 
 负责人：Claude Code
 
@@ -308,6 +308,10 @@
 - 设计导入失败、重复导入、超大文件和编码异常的处理策略。
 - 不实现前端页面，不创建复杂后端逻辑。
 
+产物：
+
+- `docs/REFERENCE_NOVEL_IMPORT_FLOW.md`
+
 验收：
 
 ```powershell
@@ -316,7 +320,7 @@
 
 ### T063：设计长文本分章和分块理解流程
 
-状态：TODO
+状态：DONE
 
 负责人：Claude Code
 
@@ -327,6 +331,10 @@
 - 明确分块理解必须通过 `backend/ai/gateway.py` 调用 AI。
 - 不实现具体 AI Provider。
 
+产物：
+
+- `docs/LONG_TEXT_CHUNKING_FLOW.md`
+
 验收：
 
 ```powershell
@@ -335,7 +343,7 @@
 
 ### T064：设计参考小说分析 Prompt 草案
 
-状态：TODO
+状态：DONE
 
 负责人：Codex
 
@@ -346,6 +354,10 @@
 - Prompt 必须禁止复制原文、搬运角色名、搬运完整剧情桥段或简单换皮。
 - 不调用真实 AI，不写业务代码。
 
+产物：
+
+- `prompts/reference_novel_analysis_prompt.md`
+
 验收：
 
 ```powershell
@@ -354,7 +366,7 @@
 
 ### T065：设计从 Reference Creation Profile 生成原创 Story Bible 的流程
 
-状态：TODO
+状态：DONE
 
 负责人：Claude Code
 
@@ -364,6 +376,10 @@
 - 明确 Story Bible 中的世界观、角色、地点、时间线和风格必须属于用户原创小说。
 - 设计用户确认、修改和拒绝生成结果的节点。
 - 不创建数据库模型，不实现 API。
+
+产物：
+
+- `docs/STORY_BIBLE_FROM_REFERENCE_PROFILE_FLOW.md`
 
 验收：
 
