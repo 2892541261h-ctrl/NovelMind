@@ -6,7 +6,9 @@ from config import settings
 from database import Base, engine
 from routers.ai import router as ai_router
 from routers.chapter import router as chapter_router
+from routers.character_cards_routes import router as cc_routes_router
 from routers.characters import router as characters_router
+from routers.chapter_plans_routes import router as cp_routes_router
 from routers.daily_writer import router as daily_writer_router
 from routers.chapters import router as chapters_router
 from routers.exports import router as exports_router
@@ -19,6 +21,8 @@ from routers.project_config import router as project_config_router
 from routers.projects import router as projects_router
 from routers.reference_novels import router as reference_novels_router
 from routers.story_bible import router as story_bible_router
+from routers.story_bible_routes import router as sb_routes_router
+from routers.world_entries_routes import router as we_routes_router
 from routers.world_settings import router as world_settings_router
 from routers.writer import router as writer_router
 from routers.writing_styles import router as writing_styles_router
@@ -55,6 +59,10 @@ app.include_router(reference_novels_router)
 app.include_router(daily_writer_router)
 app.include_router(formal_chapters_router)
 app.include_router(exports_router)
+app.include_router(sb_routes_router)
+app.include_router(cc_routes_router)
+app.include_router(we_routes_router)
+app.include_router(cp_routes_router)
 
 
 @app.get("/")
