@@ -1,4 +1,17 @@
 @echo off
+REM ============================================================
+REM NovelMind V1 Web Launcher (LEGACY)
+REM
+REM This launcher opens NovelMind in a native WebView window via
+REM pywebview. It is the original desktop launcher from V1.
+REM
+REM For the Electron-based V2 desktop client candidate, see:
+REM   desktop-electron/
+REM   docs/DESKTOP_CLIENT_GUIDE.md
+REM
+REM This file is preserved for backward compatibility.
+REM ============================================================
+
 setlocal
 
 set "ROOT=%~dp0"
