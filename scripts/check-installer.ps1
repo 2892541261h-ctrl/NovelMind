@@ -32,7 +32,20 @@ try {
     Require-File "installer\build-msi.ps1"
     Require-File "installer\README.md"
     Require-File "installer\NovelMind.wxs"
+    Require-File "installer\assets\NovelMind.ico"
     Require-File "docs\WINDOWS_INSTALLER_GUIDE.md"
+
+    $wxs = Get-Content "installer\NovelMind.wxs" -Raw
+    if ($wxs -notmatch 'NovelMind\.ico') {
+        Fail "NovelMind.wxs does not reference NovelMind.ico"
+    }
+    if ($wxs -notmatch 'Icon="NovelMindIcon"') {
+        Fail "NovelMind shortcuts do not use NovelMindIcon"
+    }
+    if ($wxs -notmatch 'ARPPRODUCTICON') {
+        Fail "NovelMind.wxs does not configure ARPPRODUCTICON"
+    }
+    Pass "WiX icon configuration is present"
 
     $gitignore = Get-Content ".gitignore" -Raw
     $requiredIgnores = @(

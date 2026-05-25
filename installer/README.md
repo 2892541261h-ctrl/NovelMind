@@ -43,6 +43,8 @@ The MSI config creates:
 - Desktop shortcut: `NovelMind`
 - Start Menu shortcut: `NovelMind`
 
+Both shortcuts use `installer/assets/NovelMind.ico` as the NovelMind application icon. The MSI also sets the ARP product icon so Windows Apps & Features / Control Panel can show the same icon where supported.
+
 Both shortcuts point to `NovelMind Launcher.bat`, which runs:
 
 ```powershell

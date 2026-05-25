@@ -18,6 +18,7 @@ V1 Final 是当前本地完整封版状态。本轮重点是 UI 中文化、浅�
 
 - 新增 `scripts/launch-novelmind.ps1` 和 `NovelMind Launcher.bat`，用于启动本地后端、前端并打开 `http://localhost:5173`。
 - 新增 `installer/build-msi.ps1`、`installer/NovelMind.wxs` 和 `installer/README.md`，优先使用 WiX Toolset 构建 MSI。
+- 新增 `installer/assets/NovelMind.ico` 应用图标，桌面快捷方式、开始菜单快捷方式和 Windows Apps & Features / Control Panel 产品图标配置会使用该图标；需要重新构建 MSI 才能看到新图标。
 - 新增 `docs/WINDOWS_INSTALLER_GUIDE.md`，说明构建、安装、启动、依赖和 API Key 安全边界。
 - 新增 `scripts/check-installer.ps1`，检查安装器源码和禁止提交 MSI/EXE/ZIP 构建产物。
 - MSI 预览版仍依赖本机已有 PowerShell、Python 和 Node.js，不是完全离线桌面应用。

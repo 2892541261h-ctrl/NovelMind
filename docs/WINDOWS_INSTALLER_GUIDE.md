@@ -51,9 +51,28 @@ Do not commit this file.
 1. Run `NovelMind-V1-Setup.msi`.
 2. Confirm the Desktop shortcut `NovelMind` exists.
 3. Confirm the Start Menu shortcut `NovelMind` exists.
-4. Double-click `NovelMind`.
-5. Wait for the backend and frontend windows to start.
-6. The launcher opens `http://localhost:5173`.
+4. Confirm both shortcuts show the NovelMind app icon.
+5. Double-click `NovelMind`.
+6. Wait for the backend and frontend windows to start.
+7. The launcher opens `http://localhost:5173`.
+
+## Application Icon
+
+The installer source includes `installer/assets/NovelMind.ico`.
+
+The WiX configuration uses this icon for:
+
+- Desktop shortcut.
+- Start Menu shortcut.
+- Windows Apps & Features / Control Panel product icon where supported.
+
+Rebuild the MSI after changing the icon:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\installer\build-msi.ps1
+```
+
+The generated MSI remains a local build artifact and must not be committed.
 
 If startup fails, the launcher keeps the window open so the error can be read.
 

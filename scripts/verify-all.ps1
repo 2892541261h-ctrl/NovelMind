@@ -94,13 +94,14 @@ $secretPatterns = @(
     "BEGIN (RSA|OPENSSH|EC|DSA) PRIVATE KEY"
 )
 
-$textFiles = Get-ChildItem -Recurse -File |
+$textFiles = Get-ChildItem -Recurse -File -Include *.py,*.ps1,*.md,*.txt,*.json,*.toml,*.yaml,*.yml,*.ts,*.tsx,*.js,*.jsx,*.html,*.css |
     Where-Object {
         $_.FullName -notmatch "\\.git\\" -and
         $_.FullName -notmatch "\\node_modules\\" -and
         $_.FullName -notmatch "\\.venv\\" -and
         $_.FullName -notmatch "\\__pycache__\\" -and
-        $_.FullName -notmatch "\\dist\\"
+        $_.FullName -notmatch "\\dist\\" -and
+        $_.FullName -notmatch "\\package-lock\.json$"
     }
 
 foreach ($pattern in $secretPatterns) {
