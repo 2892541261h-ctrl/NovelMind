@@ -24,5 +24,11 @@ installer/**/*.msi
 installer/**/*.exe
 installer/**/*.zip
 
+desktop-electron/node_modules/
+desktop-electron/dist/
+desktop-electron/out/
+desktop-electron/*.exe
+desktop-electron/*.msi
+
 .DS_Store
 Thumbs.db
