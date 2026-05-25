@@ -62,7 +62,9 @@ def publish_draft(db: Session, draft_id: int, overwrite_existing: bool = False) 
     draft = db.query(ChapterDraft).filter(ChapterDraft.id == draft_id).first()
     if not draft:
         raise ValueError("Draft not found")
-    if not draft.content.strip():
+    content = draft.content or ""
+    title = draft.title or ""
+    if not content.strip():
         raise ValueError("Cannot publish empty draft")
 
     existing = get_by_number(db, draft.project_id, draft.chapter_number)
@@ -73,9 +75,9 @@ def publish_draft(db: Session, draft_id: int, overwrite_existing: bool = False) 
         )
 
     if existing and overwrite_existing:
-        existing.title = draft.title
-        existing.content = draft.content
-        existing.word_count = _count_words(draft.content)
+        existing.title = title
+        existing.content = content
+        existing.word_count = _count_words(content)
         existing.source_draft_id = draft.id
         existing.published_at = datetime.utcnow()
         existing.status = "published"
@@ -86,9 +88,9 @@ def publish_draft(db: Session, draft_id: int, overwrite_existing: bool = False) 
     ch = Chapter(
         project_id=draft.project_id,
         chapter_number=draft.chapter_number,
-        title=draft.title,
-        content=draft.content,
-        word_count=_count_words(draft.content),
+        title=title,
+        content=content,
+        word_count=_count_words(content),
         status="published",
         source_draft_id=draft.id,
         published_at=datetime.utcnow(),
@@ -99,5 +101,7 @@ def publish_draft(db: Session, draft_id: int, overwrite_existing: bool = False) 
     return ch
 
 
-def _count_words(content: str) -> int:
+def _count_words(content: str | None) -> int:
+    if not content:
+        return 0
     return len(content.replace(" ", "").replace("\n", "").replace("\r", ""))

@@ -7,7 +7,7 @@ import time
 import urllib.request
 import urllib.error
 
-from .types import AIRequest, AIResponse
+from .types import AIMessage, AIRequest, AIResponse
 
 
 async def generate_text(request: AIRequest, feature_name: str = "other",
@@ -40,23 +40,38 @@ async def generate_text(request: AIRequest, feature_name: str = "other",
         t0 = time.time()
 
         if provider_type == "mock" or not model_cfg or not provider_cfg:
+            provider_type = request.provider or provider_type
             from .provider_factory import get_provider as get_mock_provider
-            provider = get_mock_provider(None)
-            response = await provider.generate(request)
+            try:
+                provider = get_mock_provider(provider_type)
+                response = await provider.generate(request)
+            except ValueError as exc:
+                response = AIResponse(provider=provider_type, model=request.model or model_name,
+                                      content="", raw={}, usage={}, error=str(exc))
         elif provider_type == "oai_compat":
             key_mode = provider_cfg.api_key_mode if provider_cfg else "env_var"
             response = _call_oai_compat(request, model_name, base_url, env_var, key_mode, provider_id)
         else:
-            from .provider_factory import get_provider as get_mock_provider
-            provider = get_mock_provider(None)
-            response = await provider.generate(request)
+            response = AIResponse(provider=provider_type, model=model_name, content="", raw={},
+                                  usage={}, error=f"Unsupported AI provider: {provider_type}")
 
         latency_ms = int((time.time() - t0) * 1000)
+        usage = response.usage or {}
+        prompt_preview = _trunc(str(request.messages[0].content) if request.messages else "", 500)
+        if response.error:
+            safe_response_error = _redact_api_key(response.error)
+            _log_usage(feature_name, provider_type, model_name, "error",
+                       usage.get("prompt_tokens"), usage.get("completion_tokens"),
+                       usage.get("total_tokens"), provider_id, model_cfg_id, latency_ms,
+                       prompt_preview, "", error_message=safe_response_error[:500])
+            response.error = safe_response_error
+            response.model = model_name
+            response.provider = provider_type
+            return response
         _log_usage(feature_name, provider_type, model_name, "success",
-                   response.usage.get("prompt_tokens"), response.usage.get("completion_tokens"),
-                   response.usage.get("total_tokens"), provider_id, model_cfg_id, latency_ms,
-                   _trunc(str(request.messages[0].content) if request.messages else "", 500),
-                   _trunc(response.content, 500))
+                   usage.get("prompt_tokens"), usage.get("completion_tokens"),
+                   usage.get("total_tokens"), provider_id, model_cfg_id, latency_ms,
+                   prompt_preview, _trunc(response.content, 500))
         response.model = model_name
         response.provider = provider_type
         return response
@@ -70,8 +85,47 @@ async def generate_text(request: AIRequest, feature_name: str = "other",
                           content="", raw={}, usage={}, error=safe_error)
 
 
+async def test_provider_connection(provider_cfg) -> tuple[bool, str]:
+    """Test a configured provider without exposing API keys outside the gateway."""
+    provider_type = getattr(provider_cfg, "provider_type", "")
+    if provider_type == "mock":
+        return True, "Mock provider is available."
+    if provider_type != "oai_compat":
+        return False, "Unsupported provider type."
+
+    provider_id = getattr(provider_cfg, "id", None)
+    key_mode = getattr(provider_cfg, "api_key_mode", "env_var")
+    env_var = getattr(provider_cfg, "api_key_env_var", "")
+    base_url = getattr(provider_cfg, "base_url", "")
+    model = getattr(provider_cfg, "default_model", "") or "gpt-4o-mini"
+
+    if key_mode == "direct_local" and provider_id:
+        from services.local_secret_service import get_api_key
+        api_key = get_api_key(provider_id) or ""
+    else:
+        api_key = os.environ.get(env_var, "") if env_var else ""
+
+    if not api_key:
+        return False, "API Key is not configured."
+    if not base_url:
+        return False, "Base URL is not configured."
+
+    request = AIRequest(
+        task="provider_connection_test",
+        messages=[AIMessage(role="user", content="OK")],
+        max_tokens=5,
+    )
+    response = _call_oai_compat(
+        request, model, base_url, env_var, key_mode, provider_id, timeout_seconds=15
+    )
+    if response.error:
+        return False, _provider_test_message(response.error)
+    return True, "Provider connection succeeded."
+
+
 def _call_oai_compat(request: AIRequest, model: str, base_url: str, env_var: str,
-                     key_mode: str = "env_var", provider_id: int | None = None) -> AIResponse:
+                     key_mode: str = "env_var", provider_id: int | None = None,
+                     timeout_seconds: int = 120) -> AIResponse:
     if key_mode == "direct_local" and provider_id:
         from services.local_secret_service import get_api_key
         api_key = get_api_key(provider_id) or ""
@@ -88,15 +142,16 @@ def _call_oai_compat(request: AIRequest, model: str, base_url: str, env_var: str
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
     try:
-        with urllib.request.urlopen(req, timeout=120) as resp:
+        with urllib.request.urlopen(req, timeout=timeout_seconds) as resp:
             raw = json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as e:
         body_text = _redact_api_key(e.read().decode("utf-8", errors="replace"))
         return AIResponse(provider="oai_compat", model=model, content="",
                           raw={"error": body_text[:500]}, usage={}, error=f"HTTP {e.code}: {body_text[:200]}")
     except Exception as e:
+        safe_error = _redact_api_key(str(e))
         return AIResponse(provider="oai_compat", model=model, content="",
-                          raw={}, usage={}, error=str(e))
+                          raw={}, usage={}, error=safe_error)
 
     choice = (raw.get("choices") or [{}])[0]
     content = choice.get("message", {}).get("content", "")
@@ -163,3 +218,17 @@ def _redact_api_key(text: str) -> str:
     text = re.sub(r'\b(' + ("s" + "k" + "-") + r'[a-zA-Z0-9_-]{20,})\b', ("s" + "k" + "-") + '[REDACTED]', text)
     text = re.sub(r'\b(OPENAI_API_KEY)=\S+', r'\1=[REDACTED]', text)
     return text
+
+
+def _provider_test_message(error: str) -> str:
+    msg = _redact_api_key(error)[:200]
+    lower = msg.lower()
+    if "401" in msg or "403" in msg:
+        return "API Key is invalid or unauthorized."
+    if "404" in msg:
+        return "Base URL or model route was not found."
+    if "timeout" in lower or "timed out" in lower:
+        return "Provider connection timed out."
+    if "refused" in lower:
+        return "Provider connection was refused."
+    return f"Provider connection failed: {msg}"

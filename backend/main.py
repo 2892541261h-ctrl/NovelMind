@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from sqlalchemy import inspect, text
 
 from config import settings
 from database import Base, engine
@@ -39,7 +40,27 @@ from routers.writing_styles import router as writing_styles_router
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     Base.metadata.create_all(bind=engine)
+    _ensure_sqlite_schema()
     yield
+
+
+def _ensure_sqlite_schema() -> None:
+    """Apply tiny SQLite compatibility fixes for local V1 databases."""
+    if engine.dialect.name != "sqlite":
+        return
+    with engine.begin() as conn:
+        inspector = inspect(conn)
+        table_names = set(inspector.get_table_names())
+        if "ai_provider_configs" not in table_names:
+            return
+        provider_columns = {col["name"] for col in inspector.get_columns("ai_provider_configs")}
+        if "api_key_mode" not in provider_columns:
+            conn.execute(
+                text(
+                    "ALTER TABLE ai_provider_configs "
+                    "ADD COLUMN api_key_mode VARCHAR(20) NOT NULL DEFAULT 'env_var'"
+                )
+            )
 
 
 app = FastAPI(
