@@ -1,4 +1,5 @@
 import json
+import re
 
 from sqlalchemy.orm import Session
 
@@ -150,13 +151,15 @@ def _user_prompt(content: str) -> str:
 def _extract_section(text: str, tag: str) -> str:
     if not text:
         return ""
-    try:
-        start = text.lower().index(f"[{tag}]")
-        rest = text[start + len(tag) + 2:]
-        for end_tag in ["[worldbuilding]", "[characters]", "[conflict]", "[style]", "[plot]", "[direction]"]:
-            end_pos = rest.lower().find(f"[{end_tag}]")
-            if end_pos > 0:
-                return rest[:end_pos].strip()
-        return rest.strip()
-    except ValueError:
-        return text[:200] if text else ""
+    matches = list(re.finditer(r"\[(worldbuilding|characters|conflict|style|plot|direction)\]", text, re.IGNORECASE))
+    if not matches:
+        return ""
+
+    for index, match in enumerate(matches):
+        if match.group(1).lower() != tag.lower():
+            continue
+        start = match.end()
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
+        return text[start:end].strip()
+
+    return ""

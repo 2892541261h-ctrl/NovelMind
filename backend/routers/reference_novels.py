@@ -23,6 +23,21 @@ def create_novel(data: ReferenceNovelCreate, db: Session = Depends(get_db)):
     return svc.create_novel(db, data)
 
 
+@router.get("/profiles/{profile_id}", response_model=ReferenceProfileResponse)
+def get_profile(profile_id: int, db: Session = Depends(get_db)):
+    profile = svc.get_profile(db, profile_id)
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    return profile
+
+
+@router.delete("/profiles/{profile_id}", status_code=204)
+def delete_profile(profile_id: int, db: Session = Depends(get_db)):
+    ok = svc.delete_profile(db, profile_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Profile not found")
+
+
 @router.get("/{novel_id}", response_model=ReferenceNovelResponse)
 def get_novel(novel_id: int, db: Session = Depends(get_db)):
     novel = svc.get_novel(db, novel_id)
@@ -61,18 +76,3 @@ def get_novel_profile(novel_id: int, db: Session = Depends(get_db)):
     if not profile:
         raise HTTPException(status_code=404, detail="No profile found. Run analysis first.")
     return profile
-
-
-@router.get("/profiles/{profile_id}", response_model=ReferenceProfileResponse)
-def get_profile(profile_id: int, db: Session = Depends(get_db)):
-    profile = svc.get_profile(db, profile_id)
-    if not profile:
-        raise HTTPException(status_code=404, detail="Profile not found")
-    return profile
-
-
-@router.delete("/profiles/{profile_id}", status_code=204)
-def delete_profile(profile_id: int, db: Session = Depends(get_db)):
-    ok = svc.delete_profile(db, profile_id)
-    if not ok:
-        raise HTTPException(status_code=404, detail="Profile not found")

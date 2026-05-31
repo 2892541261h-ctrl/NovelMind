@@ -15,6 +15,18 @@ from services.aul_service import get_summary as get_usage_summary
 
 
 def get_dashboard_summary(project_id: int) -> dict:
+    profiles = []
+    bibles = []
+    cards = []
+    entries = []
+    plans = []
+    drafts = []
+    formal = []
+    summaries = []
+    open_threads = []
+    reviews = []
+    usage = None
+
     db = SessionLocal()
     try:
         profiles = list_profiles(db, project_id)
@@ -29,7 +41,9 @@ def get_dashboard_summary(project_id: int) -> dict:
         reviews = list_reviews(db, project_id)
         usage = get_usage_summary(db)
     except Exception:
-        usage = None
+        # Dashboard should degrade to empty counts instead of crashing the page
+        # when one optional aggregate query fails against a local SQLite DB.
+        pass
     finally:
         db.close()
 

@@ -1,5 +1,6 @@
 """统一 AI 调用入口 - v1.3: supports configurable providers, usage logging, cost estimation."""
 
+import asyncio
 import json
 import os
 import re
@@ -50,7 +51,9 @@ async def generate_text(request: AIRequest, feature_name: str = "other",
                                       content="", raw={}, usage={}, error=str(exc))
         elif provider_type == "oai_compat":
             key_mode = provider_cfg.api_key_mode if provider_cfg else "env_var"
-            response = _call_oai_compat(request, model_name, base_url, env_var, key_mode, provider_id)
+            response = await asyncio.to_thread(
+                _call_oai_compat, request, model_name, base_url, env_var, key_mode, provider_id
+            )
         else:
             response = AIResponse(provider=provider_type, model=model_name, content="", raw={},
                                   usage={}, error=f"Unsupported AI provider: {provider_type}")
@@ -115,8 +118,8 @@ async def test_provider_connection(provider_cfg) -> tuple[bool, str]:
         messages=[AIMessage(role="user", content="OK")],
         max_tokens=5,
     )
-    response = _call_oai_compat(
-        request, model, base_url, env_var, key_mode, provider_id, timeout_seconds=15
+    response = await asyncio.to_thread(
+        _call_oai_compat, request, model, base_url, env_var, key_mode, provider_id, 15
     )
     if response.error:
         return False, _provider_test_message(response.error)
@@ -131,6 +134,12 @@ def _call_oai_compat(request: AIRequest, model: str, base_url: str, env_var: str
         api_key = get_api_key(provider_id) or ""
     else:
         api_key = os.environ.get(env_var, "")
+    if not api_key:
+        return AIResponse(provider="oai_compat", model=model, content="", raw={}, usage={},
+                          error="API Key is not configured.")
+    if not base_url:
+        return AIResponse(provider="oai_compat", model=model, content="", raw={}, usage={},
+                          error="Base URL is not configured.")
     url = base_url.rstrip("/") + "/chat/completions"
     body = {
         "model": model,
@@ -153,8 +162,28 @@ def _call_oai_compat(request: AIRequest, model: str, base_url: str, env_var: str
         return AIResponse(provider="oai_compat", model=model, content="",
                           raw={}, usage={}, error=safe_error)
 
-    choice = (raw.get("choices") or [{}])[0]
-    content = choice.get("message", {}).get("content", "")
+    if not isinstance(raw, dict):
+        return AIResponse(provider="oai_compat", model=model, content="", raw={},
+                          usage={}, error="Provider returned an invalid JSON response.")
+
+    raw_error = raw.get("error") if isinstance(raw, dict) else None
+    if raw_error:
+        safe_error = _redact_api_key(json.dumps(raw_error, ensure_ascii=False))
+        return AIResponse(provider="oai_compat", model=model, content="",
+                          raw={"error": safe_error[:500]}, usage={}, error=safe_error[:500])
+
+    choices = raw.get("choices") or []
+    if not choices:
+        return AIResponse(provider="oai_compat", model=model, content="", raw=raw,
+                          usage=raw.get("usage", {}), error="Provider returned no choices.")
+
+    choice = choices[0]
+    content = _extract_oai_content(choice)
+    if not content.strip():
+        finish_reason = choice.get("finish_reason") or "unknown"
+        return AIResponse(provider="oai_compat", model=model, content="", raw=raw,
+                          usage=raw.get("usage", {}),
+                          error=f"Provider returned empty content (finish_reason={finish_reason}).")
     usage_data = raw.get("usage", {})
     return AIResponse(
         provider="oai_compat", model=model, content=content, raw=raw,
@@ -164,6 +193,26 @@ def _call_oai_compat(request: AIRequest, model: str, base_url: str, env_var: str
             "total_tokens": usage_data.get("total_tokens", 0),
         }, error=None,
     )
+
+
+def _extract_oai_content(choice: dict) -> str:
+    message = choice.get("message") or {}
+    content = message.get("content")
+    if content is None:
+        content = choice.get("text", "")
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = []
+        for item in content:
+            if isinstance(item, str):
+                parts.append(item)
+            elif isinstance(item, dict):
+                part = item.get("text") or item.get("content") or ""
+                if isinstance(part, str):
+                    parts.append(part)
+        return "".join(parts)
+    return str(content) if content is not None else ""
 
 
 def _log_usage(feature: str, ptype: str, model: str, status: str,
