@@ -1,6 +1,7 @@
 """Chapter Review service - AI-powered quality checks via backend/ai/gateway.py."""
 
 import json
+import re
 
 from sqlalchemy.orm import Session
 
@@ -128,12 +129,15 @@ def _parse_scores(text: str) -> dict:
 def _extract_section(text: str, tag: str, default: str) -> str:
     if not text:
         return default
-    try:
-        start = text.lower().index(f"[{tag}]")
-        rest = text[start + len(tag) + 2:]
-        for end_tag in ["[outline]", "[notes]", "[text]", "[issues]", "[suggestions]"]:
-            end_pos = rest.lower().find(f"[{end_tag}]")
-            if end_pos > 0: return rest[:end_pos].strip()
-        return rest.strip()[:500]
-    except ValueError:
+    matches = list(re.finditer(r"\[(outline|notes|text|issues|suggestions)\]", text, re.IGNORECASE))
+    if not matches:
         return default
+
+    for index, match in enumerate(matches):
+        if match.group(1).lower() != tag.lower():
+            continue
+        start = match.end()
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
+        return text[start:end].strip()
+
+    return default

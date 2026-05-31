@@ -18,6 +18,7 @@ from ai.gateway import _extract_oai_content  # noqa: E402
 from database import Base, get_db  # noqa: E402
 from main import app  # noqa: E402
 from models.reference_profile import ReferenceProfile  # noqa: E402
+from services.cr_service import _extract_section as _extract_rewrite_section  # noqa: E402
 from services.dashboard_service import get_dashboard_summary  # noqa: E402
 from services.reference_novel_service import _extract_section  # noqa: E402
 import services.dashboard_service as dashboard_service  # noqa: E402
@@ -142,3 +143,15 @@ def test_oai_content_extractor_supports_list_content() -> None:
     )
 
     assert content == "第一段第二段"
+
+
+def test_rewrite_suggestion_sections_do_not_bleed_into_each_other() -> None:
+    text = (
+        "[outline]\n先重排冲突，再强化结尾钩子。\n"
+        "[notes]\n保留主线目标，删掉重复对白。\n"
+        "[text]\n这里是建议改写后的正文片段。\n"
+    )
+
+    assert _extract_rewrite_section(text, "outline", "") == "先重排冲突，再强化结尾钩子。"
+    assert _extract_rewrite_section(text, "notes", "") == "保留主线目标，删掉重复对白。"
+    assert _extract_rewrite_section(text, "text", "") == "这里是建议改写后的正文片段。"
