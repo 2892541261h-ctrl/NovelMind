@@ -12,9 +12,11 @@ import { ReferenceNovelPage } from "./pages/ReferenceNovelPage";
 import { AISettingsPage } from "./pages/AISettingsPage";
 
 export default function App() {
+  const basename = window.location.pathname.startsWith("/app") ? "/app" : undefined;
+
   return (
     <ThemeProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={basename}>
         <Routes>
           <Route element={<Layout />}>
             <Route index element={<DashboardPage />} />

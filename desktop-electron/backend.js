@@ -24,12 +24,69 @@ function findPython(repoRoot, log) {
     return repoVenv;
   }
 
-  // 2. System Python via `where` (Windows) or `which` (Unix)
+  function isCompatiblePython(pythonPath) {
+    try {
+      const version = execSync(
+        `"${pythonPath}" -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"`,
+        { encoding: "utf-8", timeout: 5000, windowsHide: true }
+      ).trim();
+      const [major, minor] = version.split(".").map((value) => Number(value));
+      const compatible = major === 3 && minor >= 11 && minor <= 13;
+      if (!compatible) {
+        log(`skipping incompatible Python ${version}: ${pythonPath}`);
+      }
+      return compatible;
+    } catch (err) {
+      log(`could not inspect Python version for ${pythonPath}: ${err.message}`);
+      return false;
+    }
+  }
+
+  // 2. Windows py launcher can find compatible runtimes even when PATH points to
+  // an unsupported preview/newer Python.
+  if (isWindows) {
+    try {
+      const runtimes = execSync("py -0p", {
+        encoding: "utf-8",
+        timeout: 5000,
+        windowsHide: true,
+      });
+      for (const line of runtimes.split(/\r?\n/)) {
+        const match = line.match(/([A-Za-z]:\\.*python\.exe)\s*$/i);
+        if (match) {
+          const pythonPath = match[1].trim();
+          if (fs.existsSync(pythonPath) && isCompatiblePython(pythonPath)) {
+            log(`using Python from py launcher list: ${pythonPath}`);
+            return pythonPath;
+          }
+        }
+      }
+    } catch (_) {
+      // Fall back to direct py launcher version probes.
+    }
+
+    for (const version of ["3.12", "3.11"]) {
+      try {
+        const pythonPath = execSync(
+          `py -${version} -c "import sys; print(sys.executable)"`,
+          { encoding: "utf-8", timeout: 5000, windowsHide: true }
+        ).trim();
+        if (pythonPath && fs.existsSync(pythonPath) && isCompatiblePython(pythonPath)) {
+          log(`using Python from py launcher ${version}: ${pythonPath}`);
+          return pythonPath;
+        }
+      } catch (_) {
+        // Try the next compatible version.
+      }
+    }
+  }
+
+  // 3. System Python via `where` (Windows) or `which` (Unix)
   try {
     const cmd = isWindows ? "where python" : "which python3 || which python";
     const result = execSync(cmd, { encoding: "utf-8", timeout: 5000 }).trim();
-    const pythonPath = result.split("\n")[0].trim();
-    if (pythonPath) {
+    const pythonPath = result.split(/\r?\n/)[0].trim();
+    if (pythonPath && isCompatiblePython(pythonPath)) {
       log(`using system Python: ${pythonPath}`);
       return pythonPath;
     }
@@ -37,14 +94,39 @@ function findPython(repoRoot, log) {
     // fall through
   }
 
-  // 3. Default: just "python" and hope it's on PATH
-  log("falling back to 'python' on PATH");
-  return "python";
+  throw new Error("No compatible Python 3.11-3.13 runtime found. Install Python 3.11 or 3.12 and retry.");
+}
+
+function ensureRuntimePython(basePythonExe, repoRoot, logDir, log) {
+  const repoVenv = path.join(repoRoot, ".venv", "Scripts", "python.exe");
+  if (path.normalize(basePythonExe).toLowerCase() === path.normalize(repoVenv).toLowerCase()) {
+    return basePythonExe;
+  }
+
+  const runtimeRoot = path.join(path.dirname(logDir), "python-runtime");
+  const runtimePython = path.join(runtimeRoot, "Scripts", "python.exe");
+
+  if (!fs.existsSync(runtimePython)) {
+    log(`creating app-local Python runtime: ${runtimeRoot}`);
+    fs.mkdirSync(runtimeRoot, { recursive: true });
+    execSync(`"${basePythonExe}" -m venv "${runtimeRoot}"`, {
+      timeout: 180_000,
+      windowsHide: true,
+    });
+  }
+
+  if (!fs.existsSync(runtimePython)) {
+    throw new Error(`app-local Python runtime was not created: ${runtimePython}`);
+  }
+
+  log(`using app-local Python runtime: ${runtimePython}`);
+  return runtimePython;
 }
 
 // ── Start Backend ────────────────────────────────────────────────────────────
 function startBackend({ repoRoot, backendUrl, logDir, log }) {
-  const pythonExe = findPython(repoRoot, log);
+  const basePythonExe = findPython(repoRoot, log);
+  const pythonExe = ensureRuntimePython(basePythonExe, repoRoot, logDir, log);
   const backendDir = path.join(repoRoot, "backend");
 
   if (!fs.existsSync(backendDir)) {
@@ -61,7 +143,7 @@ function startBackend({ repoRoot, backendUrl, logDir, log }) {
     log("installing/checking backend dependencies...");
     execSync(`"${pythonExe}" -m pip install -r "${requirementsFile}" --quiet`, {
       cwd: backendDir,
-      timeout: 120_000,
+      timeout: 300_000,
       windowsHide: true,
     });
   } catch (err) {

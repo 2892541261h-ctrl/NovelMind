@@ -94,6 +94,7 @@ async function main() {
       config: {
         appId: "com.novelmind.desktop",
         productName: "NovelMind",
+        compression: "store",
         directories: {
           output: "dist",
         },
@@ -112,10 +113,11 @@ async function main() {
             to: "backend",
             filter: [
               "**/*",
-              "!__pycache__/**",
-              "!*.db",
-              "!*.sqlite3",
-              "!*.pyc",
+              "!**/__pycache__/**",
+              "!**/*.pyc",
+              "!**/*.db",
+              "!**/*.sqlite",
+              "!**/*.sqlite3",
             ],
           },
           {

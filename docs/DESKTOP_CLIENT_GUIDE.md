@@ -60,7 +60,7 @@ npm start
 ```
 
 This:
-1. Checks for Python (`.venv/Scripts/python.exe` or system `python`)
+1. Checks for Python (`.venv/Scripts/python.exe`, a compatible `py -0p` runtime, or system `python`)
 2. Starts the FastAPI backend on `http://127.0.0.1:8765`
 3. Waits for `/health` to return 200
 4. Opens the Electron window at `http://127.0.0.1:8765/app`
@@ -72,9 +72,9 @@ This:
 
 | Dependency | Required? | Notes |
 |-----------|-----------|-------|
-| Python 3.11+ | **Yes** | Backend is not yet packaged as standalone .exe |
-| Node.js 18+ | Yes | For Electron runtime |
-| npm | Yes | For `npm install` in desktop-electron/ |
+| Python 3.11-3.13 | **Yes** | Backend is not yet packaged as standalone .exe; Python 3.14 is intentionally skipped for dependency compatibility |
+| Node.js 18+ | Build/dev only | The installed Electron app bundles Chromium and frontend assets |
+| npm | Build/dev only | For `npm install` and `npm run build` in `desktop-electron/` |
 | Electron | Auto-installed | `npm install` in desktop-electron/ installs it |
 | Google Chrome | No | Electron bundles Chromium |
 
@@ -83,8 +83,9 @@ This:
 **The Python backend is NOT yet packaged as a standalone .exe.**
 
 - **PyInstaller is not currently installed** on development machines.
-- The Electron desktop client starts the backend via `python -m uvicorn`, same as the V1 launcher.
-- Users must have Python 3.11+ and all `backend/requirements.txt` dependencies installed.
+- The Electron desktop client starts the backend via an app-local Python virtual environment in `%APPDATA%\novelmind-desktop\python-runtime`.
+- On first launch, it creates that runtime from a compatible Python 3.11-3.13 installation and installs `backend/requirements.txt` there.
+- Users need Python 3.11-3.13 available, but they do not need to pre-install backend dependencies into system Python.
 
 **Next steps for standalone packaging:**
 1. Install PyInstaller: `pip install pyinstaller`
@@ -113,13 +114,13 @@ npm install
 npm run build        # Electron-builder produces NSIS installer
 ```
 
-Output: `desktop-electron/dist/NovelMind-Setup-*.exe`
+Output: `desktop-electron/dist/NovelMind Setup 2.0.0.exe`
 
 **Note:** This produces an NSIS installer, not MSI. The existing WiX MSI in `installer/` is preserved for V1.
 
 ## Logs
 
-Logs are written to `%APPDATA%\NovelMind\logs\`:
+Logs are written to `%APPDATA%\novelmind-desktop\logs\`:
 
 | File | Content |
 |------|---------|
@@ -130,11 +131,11 @@ To view logs:
 
 ```powershell
 # Open logs directory
-explorer $env:APPDATA\NovelMind\logs
+explorer $env:APPDATA\novelmind-desktop\logs
 
 # Or read latest lines
-Get-Content $env:APPDATA\NovelMind\logs\backend.log -Tail 50
-Get-Content $env:APPDATA\NovelMind\logs\desktop.log -Tail 50
+Get-Content $env:APPDATA\novelmind-desktop\logs\backend.log -Tail 50
+Get-Content $env:APPDATA\novelmind-desktop\logs\desktop.log -Tail 50
 ```
 
 ## Exit Backend Services
@@ -156,12 +157,12 @@ taskkill /PID <PID> /F
 
 ## Current Limitations
 
-1. **Python runtime required**: The backend is not packaged as a standalone .exe. Users need Python 3.11+.
+1. **Python runtime required**: The backend is not packaged as a standalone .exe. Users need Python 3.11-3.13.
 2. **No code signing**: Windows SmartScreen will show a warning on first launch. Expected for dev/candidate builds.
 3. **No auto-start**: The app does not start automatically with Windows.
 4. **No MSI installer**: Uses NSIS (electron-builder default), not WiX MSI.
 5. **One instance only**: Only one NovelMind instance can run at a time (by design).
-6. **Frontend must be pre-built**: `npm run build` in `frontend/` must run before starting the desktop app. The Electron app auto-detects this and shows a loading screen.
+6. **Frontend must be pre-built for packaging**: `npm run build` in `frontend/` must run before `npm run build` in `desktop-electron/`. The installed app serves the packaged frontend from `http://127.0.0.1:8765/app`.
 
 ## Next Steps
 
