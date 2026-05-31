@@ -580,7 +580,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-installe
 
 范围：
 
-- 封装 fetch 请求，默认 `http://localhost:8000`。
+- 封装 fetch 请求，默认 `http://localhost:8765`。
 - 支持 `VITE_API_BASE_URL` 环境变量。
 - 提供 Projects/Characters/Chapters 的 CRUD 方法。
 

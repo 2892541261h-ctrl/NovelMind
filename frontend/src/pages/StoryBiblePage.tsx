@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
+import { getBaseUrl } from "../api/client";
 
-const BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+const BASE = getBaseUrl();
 
 type TabKey = "bible" | "cards" | "entries" | "plans" | "summaries" | "threads";
 

@@ -5,7 +5,7 @@
 //   2. System tray — minimize to tray, not close
 //   3. Backend sidecar — spawn/kill Python FastAPI process
 //   4. Health polling — wait for backend before loading frontend
-//   5. BrowserWindow — load backend-served SPA at http://127.0.0.1:8000/app
+//   5. BrowserWindow — load backend-served SPA at http://127.0.0.1:8765/app
 //
 // No external browser is opened. The Python backend runs hidden (no console window).
 
@@ -25,7 +25,8 @@ const { ensureFrontendBuilt } = require("./frontend-loader");
 const REPO_ROOT = path.resolve(__dirname, "..");
 const LOG_DIR = path.join(app.getPath("userData"), "logs");
 const ICON_PATH = path.join(__dirname, "assets", "NovelMind.ico");
-const BACKEND_URL = "http://127.0.0.1:8000";
+const NOVELMIND_PORT = process.env.NOVELMIND_BACKEND_PORT || "8765";
+const BACKEND_URL = `http://127.0.0.1:${NOVELMIND_PORT}`;
 const APP_URL = `${BACKEND_URL}/app`;
 const HEALTH_URL = `${BACKEND_URL}/health`;
 

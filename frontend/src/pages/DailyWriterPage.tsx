@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
-const BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+import { getBaseUrl } from "../api/client";
+const BASE = getBaseUrl();
 interface DraftItem { id: number; project_id: number; chapter_number: number; title: string; status: string; source: string; created_at: string; updated_at: string; }
 interface DraftRead extends DraftItem { content: string; writing_goal: string; prompt_snapshot: string; context_snapshot: string; }
 interface FormalItem { id: number; project_id: number; chapter_number: number; title: string; status: string; word_count: number; published_at: string|null; created_at: string; updated_at: string; }

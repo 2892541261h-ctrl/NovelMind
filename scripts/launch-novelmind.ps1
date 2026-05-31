@@ -18,7 +18,7 @@ try {
     }
 
     Write-Host "NovelMind V1 local launcher"
-    Write-Host "Backend:  http://localhost:8000"
+    Write-Host "Backend:  http://localhost:8765"
     Write-Host "Frontend: http://localhost:5173"
     Write-Host ""
     Write-Host "Starting local backend and frontend windows..."

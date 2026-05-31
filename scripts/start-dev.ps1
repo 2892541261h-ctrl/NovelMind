@@ -17,6 +17,6 @@ Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File
 Write-Host "[dev] 启动前端..."
 Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$frontendScript`"" -WorkingDirectory $repoRoot
 
-Write-Host "[dev] 后端: http://127.0.0.1:8000"
+Write-Host "[dev] 后端: http://127.0.0.1:8765"
 Write-Host "[dev] 前端: http://127.0.0.1:5173"
-Write-Host "[dev] 健康检查: Invoke-RestMethod http://127.0.0.1:8000/health"
+Write-Host "[dev] 健康检查: Invoke-RestMethod http://127.0.0.1:8765/health"

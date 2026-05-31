@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getBaseUrl } from "../api/client";
 
-const BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+const BASE = getBaseUrl();
 
 export function DashboardPage() {
   const [pid, setPid] = useState<number>(() => Number(localStorage.getItem("selectedProjectId")) || 0);

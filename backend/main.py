@@ -1,7 +1,10 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from sqlalchemy import inspect, text
 
 from config import settings
@@ -74,15 +77,45 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        # Vite dev server
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:5174",
         "http://127.0.0.1:5174",
+        # Electron desktop — frontend served from backend via /app
+        # When Electron loads from http://127.0.0.1:8765/app, the origin
+        # is http://127.0.0.1:8765.  The frontend uses relative paths
+        # (same-origin) so CORS is only needed for browser dev scenarios.
+        "http://127.0.0.1:8765",
+        "http://localhost:8765",
     ],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ── Frontend static files (Electron desktop same-origin hosting) ──────────────
+# In development, frontend is served by Vite (port 5173).
+# In Electron/production, the frontend dist/ is served by this backend
+# under /app/* so the origin matches (http://127.0.0.1:8765).
+FRONTEND_DIST = Path(__file__).resolve().parent.parent / "frontend" / "dist"
+
+
+# SPA fallback: serve /app and /app/* → index.html
+@app.get("/app")
+@app.get("/app/{full_path:path}")
+async def serve_spa(full_path: str = ""):
+    index_path = FRONTEND_DIST / "index.html"
+    if index_path.exists():
+        return FileResponse(index_path)
+    return {"detail": "Frontend not built. Run: cd frontend && npm run build"}, 503
+
+
+# Mount frontend assets at /assets/ for absolute-path SPA routing
+assets_dir = FRONTEND_DIST / "assets"
+if assets_dir.exists():
+    app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
+
 
 app.include_router(health_router)
 app.include_router(ai_router)

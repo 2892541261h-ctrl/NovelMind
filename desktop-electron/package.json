@@ -6,7 +6,7 @@
   "scripts": {
     "start": "electron .",
     "build": "node build.js",
-    "check": "node check-env.js"
+    "check": "powershell -File check-desktop.ps1"
   },
   "author": "NovelMind",
   "license": "UNLICENSED",

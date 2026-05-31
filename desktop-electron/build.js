@@ -9,6 +9,11 @@
 //   3. Python 3.11+ with backend deps installed
 //
 // Output: desktop-electron/dist/NovelMind-Setup-*.exe (NSIS installer)
+//
+// NOTE: NSIS builds require Windows symlink permission (Developer Mode or
+// admin).  If winCodeSign fails with "Cannot create symbolic link", run as
+// Administrator or enable Developer Mode in Windows Settings.
+// For development / testing, use `electron .` (npm run start) instead.
 
 const { execSync } = require("child_process");
 const path = require("path");
@@ -136,6 +141,10 @@ async function main() {
     console.log("[build] Output: desktop-electron/dist/");
   } catch (err) {
     console.error(`\n[build] Build failed: ${err.message}`);
+    console.error(
+      "\nHINT: winCodeSign symlink failures require Developer Mode or admin.\n" +
+      "For development, use `npm run start` (electron .) instead of npm run build."
+    );
     process.exit(1);
   }
 }

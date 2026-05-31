@@ -30,5 +30,8 @@ desktop-electron/out/
 desktop-electron/*.exe
 desktop-electron/*.msi
 
+# Desktop smoke test evidence (ephemeral, not to be committed)
+desktop-smoke-evidence/
+
 .DS_Store
 Thumbs.db

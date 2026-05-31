@@ -32,5 +32,5 @@ if (Test-Path $venvPython) {
 Write-Host "[backend] 安装依赖..."
 & $python -m pip install -r requirements.txt --quiet 2>&1 | Out-Null
 
-Write-Host "[backend] 启动 FastAPI 开发服务器 (http://127.0.0.1:8000)"
-& $python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000
+Write-Host "[backend] 启动 FastAPI 开发服务器 (http://127.0.0.1:8765)"
+& $python -m uvicorn main:app --reload --host 127.0.0.1 --port 8765

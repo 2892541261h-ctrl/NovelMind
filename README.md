@@ -145,7 +145,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-dev.ps1
 ### 分别启动
 
 ```powershell
-# 后端（http://127.0.0.1:8000）
+# 后端（http://127.0.0.1:8765）
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-backend.ps1
 
 # 前端（http://127.0.0.1:5173）

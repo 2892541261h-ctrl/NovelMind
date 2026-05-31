@@ -20,7 +20,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-frontend.ps1
 
 预期结果：
 
-- 后端运行在 `http://127.0.0.1:8000`
+- 后端运行在 `http://127.0.0.1:8765`
 - 前端运行在 `http://127.0.0.1:5173`
 - 没有创建 `.env`、`.db` 或导出小说文件
 

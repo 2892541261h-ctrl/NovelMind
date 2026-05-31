@@ -1,4 +1,10 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+// 桌面端 / 生产环境：同源托管，使用相对路径（空字符串）
+// 开发环境：通过 VITE_API_BASE_URL 设置，例如 http://localhost:8765
+const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
+
+export function getBaseUrl(): string {
+  return BASE_URL;
+}
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const url = `${BASE_URL}${path}`;

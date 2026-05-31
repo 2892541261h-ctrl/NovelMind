@@ -61,9 +61,9 @@ npm start
 
 This:
 1. Checks for Python (`.venv/Scripts/python.exe` or system `python`)
-2. Starts the FastAPI backend on `http://127.0.0.1:8000`
+2. Starts the FastAPI backend on `http://127.0.0.1:8765`
 3. Waits for `/health` to return 200
-4. Opens the Electron window at `http://127.0.0.1:8000/app`
+4. Opens the Electron window at `http://127.0.0.1:8765/app`
 5. Shows a system tray icon with context menu
 
 ## Dependencies
@@ -150,7 +150,7 @@ Right-click tray icon → **退出**
 Get-Process python -ErrorAction SilentlyContinue | Stop-Process -Force
 
 # Or kill by port
-netstat -ano | findstr :8000
+netstat -ano | findstr :8765
 taskkill /PID <PID> /F
 ```
 

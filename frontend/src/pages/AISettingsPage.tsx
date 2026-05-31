@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import { getBaseUrl } from "../api/client";
 
-const BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+const BASE = getBaseUrl();
 
 export function AISettingsPage() {
   const [tab, setTab] = useState<"providers" | "models" | "logs">("providers");

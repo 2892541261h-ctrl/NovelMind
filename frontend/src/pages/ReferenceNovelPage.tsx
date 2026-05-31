@@ -1,9 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
-import * as api from "../api/client";
+import { getBaseUrl, getProjects } from "../api/client";
 import type { Project } from "../types/api";
 import { LoadingState, ErrorState, EmptyState } from "../components/LoadingState";
 
-const BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+const BASE = getBaseUrl();
 
 interface RefNovel { id: number; project_id: number; title: string; author: string; content: string; source_type: string; status: string; created_at: string; updated_at: string; }
 interface RefProfile { id: number; novel_id: number; project_id: number; genre: string; worldbuilding_pattern: string; character_archetypes: string; conflict_patterns: string; writing_style_profile: string; plot_progression_model: string; target_novel_direction: string; confidence: string; status: string; }
@@ -22,7 +22,7 @@ export function ReferenceNovelPage() {
   const [creating, setCreating] = useState(false);
 
   const loadProjects = useCallback(async () => {
-    try { setProjects(await api.getProjects()); } catch { /* */ }
+    try { setProjects(await getProjects()); } catch { /* */ }
   }, []);
 
   const loadNovels = useCallback(async (pid: number) => {
